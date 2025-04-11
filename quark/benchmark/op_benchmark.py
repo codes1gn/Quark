@@ -1,9 +1,10 @@
-import torch
-import torch.utils.benchmark as benchmark
-import numpy as np
 import time
+
 import iree.compiler
 import iree.runtime
+import numpy as np
+import torch
+import torch.utils.benchmark as benchmark
 
 __all__ = ["torch_op_benchmark", "tf_op_benchmark",
            "quark_op_benchmark", "quark_model_benchmark", "torch_model_benchmark"]

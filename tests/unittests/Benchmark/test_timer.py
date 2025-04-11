@@ -1,9 +1,10 @@
 # RUN: python -m pytest -q --tb=short %s
 
+import numpy as np
 import pytest
 import torch
-import numpy as np
 from quark.benchmark.timer import *
+
 
 def dummy_function():
     """A simple dummy function that simulates workload."""

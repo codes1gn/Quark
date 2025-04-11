@@ -1,13 +1,14 @@
-import numpy as np
-import torch
-import tensorflow as tf
-import torchvision
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
-from tensorflow.data import Dataset as tfDataset
 from enum import Enum
 
-from quark.common import * 
+import numpy as np
+import tensorflow as tf
+import torch
+import torchvision
+from quark.common import *
+from tensorflow.data import Dataset as tfDataset
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
+
 from .data_provider_base import *
 
 

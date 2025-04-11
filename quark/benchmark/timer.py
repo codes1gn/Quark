@@ -1,9 +1,10 @@
 import timeit
-import torch
-import numpy as np
 from enum import Enum
 
-from quark.common import * 
+import numpy as np
+import torch
+from quark.common import *
+
 
 class TimerBase:
     """Base class for Timer implementations with statistical features."""

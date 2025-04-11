@@ -1,6 +1,7 @@
 
+from quark.common.enum import *
 from quark.workload.workload_base import *
-from quark.common.enum import * 
+
 
 class IREEWorkload(WorkloadBase):
     """Defines an IREE workload, supporting operator, model, and fused_operator granularity."""

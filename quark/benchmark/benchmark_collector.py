@@ -1,10 +1,12 @@
-import os
-import yaml
 import glob
+import os
 import time
 from typing import List
-from quark.benchmark import * 
+
+import yaml
+from quark.benchmark import *
 from quark.common import *
+
 
 class BenchmarkCollector:
     def __init__(self, arguments, config_dir: str):

@@ -1,11 +1,14 @@
 # executor/torch_executor.py
 
-import torch
 from dataclasses import dataclass, field
-from .executor_base import ExecutorBase
+
+import torch
 from quark.common import *
-from quark.workload import WorkloadBase
 from quark.data_utils import DataProviderBase
+from quark.workload import WorkloadBase
+
+from .executor_base import ExecutorBase
+
 
 @dataclass
 class TorchExecutor(ExecutorBase):

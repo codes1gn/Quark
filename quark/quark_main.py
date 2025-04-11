@@ -1,8 +1,9 @@
 import argparse
-from .common import *
-from .benchmark.benchmark_collector import BenchmarkCollector
-
 import warnings
+
+from .benchmark.benchmark_collector import BenchmarkCollector
+from .common import *
+
 warnings.filterwarnings("ignore")
 
 def parse_args():

@@ -1,8 +1,9 @@
-import tensorflow as tf
 from dataclasses import dataclass, field
 
+import tensorflow as tf
+from quark.common.enum import *
 from quark.workload.workload_base import *
-from quark.common.enum import * 
+
 
 class TFWorkload(WorkloadBase):
     """Defines a TensorFlow workload, supporting operator, model, and fused_operator granularity."""

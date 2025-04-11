@@ -2,14 +2,14 @@
 # RUN: python -m pytest -q -v --tb=short %s
 
 import pytest
-import torch
 import tensorflow as tf
-
+import torch
 from quark.common import *
-from quark.executor import ExecutorBuilder
-from quark.workload import WorkloadBase
-from quark.workload import WorkloadBuilder  # Assuming you have a WorkloadBuilder class
 from quark.data_utils import DataProviderBase, DataProviderBuilder
+from quark.executor import ExecutorBuilder
+from quark.workload import \
+    WorkloadBuilder  # Assuming you have a WorkloadBuilder class
+from quark.workload import WorkloadBase
 
 
 @pytest.fixture

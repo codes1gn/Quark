@@ -1,13 +1,15 @@
 
 # RUN: python -m pytest -q -v --tb=short %s
 
-import pytest
-import torch
-import tensorflow as tf
 import numpy as np
+import pytest
+import tensorflow as tf
+import torch
 from quark.common import *
-from quark.workload import WorkloadBase, WorkloadBuilder, TorchWorkload, TFWorkload, RunModeEnum, GranularityEnum
 from quark.data_utils import DataProviderBuilder
+from quark.workload import (GranularityEnum, RunModeEnum, TFWorkload,
+                            TorchWorkload, WorkloadBase, WorkloadBuilder)
+
 
 @pytest.fixture
 def torch_config():

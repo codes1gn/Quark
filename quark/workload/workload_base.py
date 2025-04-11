@@ -1,11 +1,11 @@
 # executor/executor.py
 
 from abc import ABC, abstractmethod
-from enum import Enum
 from dataclasses import dataclass, field
-from typing import Optional, Any
+from enum import Enum
+from typing import Any, Optional
 
-from quark.common import * 
+from quark.common import *
 from quark.data_utils import *
 
 __all__ = [

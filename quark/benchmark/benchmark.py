@@ -1,13 +1,16 @@
 
-import yaml
 import json
 import os
-from quark.common import * 
-from quark.executor import ExecutorBuilder, ExecutorBase
-from quark.workload import WorkloadBuilder, WorkloadBase
-from quark.data_utils import DataProviderBase, DataProviderBuilder
 from dataclasses import dataclass, field
+
+import yaml
+from quark.common import *
+from quark.data_utils import DataProviderBase, DataProviderBuilder
+from quark.executor import ExecutorBase, ExecutorBuilder
+from quark.workload import WorkloadBase, WorkloadBuilder
+
 from .timer import *
+
 
 def numpy_serializer(obj):
     """序列化 NumPy 类型"""

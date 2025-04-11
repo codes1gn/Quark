@@ -1,9 +1,11 @@
 
 # RUN: python -m pytest -q -v --tb=short %s
 
-import pytest
 from enum import Enum
-from quark.common import * 
+
+import pytest
+from quark.common import *
+
 
 @pytest.fixture
 def sample_config_yaml():

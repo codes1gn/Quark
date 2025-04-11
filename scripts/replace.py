@@ -2,6 +2,7 @@
 import os
 import re
 
+
 def replace_in_file(file_path, old_str, new_str):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:

@@ -1,9 +1,12 @@
 # executor/tf_executor.py
 
-import tensorflow as tf
 from dataclasses import dataclass
-from .executor_base import ExecutorBase
+
+import tensorflow as tf
 from quark.common import DeviceEnum, RunModeEnum
+
+from .executor_base import ExecutorBase
+
 
 @dataclass
 class TFExecutor(ExecutorBase):

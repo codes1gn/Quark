@@ -1,18 +1,17 @@
-from abc import ABC, abstractmethod
 import ast
-from typing import Dict, Any
-from dataclasses import dataclass
-import re
-import yaml
-from pprint import pformat
-from typing import Tuple, Optional
 import itertools
+import re
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from pprint import pformat
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+
 import numpy as np
+import yaml
+from pydantic import (BaseModel, ValidationError, field_validator,
+                      root_validator)
 
 from .enum import *
-
-from typing import Literal, Optional, Union, List
-from pydantic import BaseModel, field_validator, root_validator, ValidationError
 
 
 class OperatorConfig(BaseModel):

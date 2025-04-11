@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 __all__ = ["stringify", "destringify",
            "stringify_tensor", "change_mlir_suffix"]
 

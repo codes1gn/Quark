@@ -1,16 +1,18 @@
 # RUN: python -m pytest -q --tb=short %s
 
-import pytest
-import numpy as np
-import yaml
 import json
-import torch
+
+import numpy as np
+import pytest
 import tensorflow as tf
+import torch
+import yaml
 from quark.benchmark import Benchmark, TimerBuilder, TimerEnum
 from quark.common import *
-from quark.executor import ExecutorBuilder
 from quark.data_utils import DataProviderBuilder
+from quark.executor import ExecutorBuilder
 from quark.workload import WorkloadBuilder
+
 
 @pytest.fixture
 def torch_train_config():

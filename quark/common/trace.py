@@ -1,7 +1,6 @@
-import sys
 import inspect
+import sys
 import traceback
-
 
 # Global variable to control whether trace mode is enabled
 TRACE_ENABLED = False

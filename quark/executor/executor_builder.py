@@ -1,8 +1,10 @@
 # executor/executor_builder.py
 
 from quark.common import *
-from .torch_executor import TorchExecutor
+
 from .tf_executor import TFExecutor
+from .torch_executor import TorchExecutor
+
 
 class ExecutorBuilder:
     @staticmethod

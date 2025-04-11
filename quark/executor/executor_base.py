@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+
 from quark.common import *
-from quark.workload import WorkloadBase
 from quark.data_utils import DataProviderBase
+from quark.workload import WorkloadBase
+
 
 @dataclass
 class ExecutorBase(ABC):

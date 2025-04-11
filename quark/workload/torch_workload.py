@@ -1,13 +1,14 @@
 import io
 import sys
+from dataclasses import dataclass, field
+from typing import Any, Optional
+
 import torch
 import torch.nn as nn
 import torchvision.models as models
-from typing import Any, Optional
-from dataclasses import dataclass, field
-
+from quark.common import *
 from quark.workload.workload_base import *
-from quark.common import * 
+
 
 @dataclass
 class TorchWorkload(WorkloadBase):
