@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "quark-torch"
+version = "0.1.0"
+description = "Query-based All-in-one Research Kit (PyTorch)"
+authors = ["Albert Shi <heng.shi@sjtu.edu.cn>"]
+license = "MIT"
+
+[tool.poetry.scripts]
+quark = "quark.quark_main:main"
+build-cpp = "build:main"
+
+[tool.poetry.dependencies]
+python = "^3.9,<3.12"
+protobuf = "3.20.3"
+pyyaml = "^6.0.2"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.5.49"
+mkdocs-markdownextradata-plugin = "^0.2.6"
+transformers = "^4.47.1"
+flash-rwkv = "^0.3.0"
+pydantic = "^2.10.6"
+torch = "2.0.0"
+torchvision = "0.15.1"
+torchaudio = "2.0.1"
+torchtext = "0.15.1"
+
+[tool.poetry.dev-dependencies]
+numpy = "1.23.4"
+pybind11 = "2.10.4"
+pandas = "1.3.0"
+seaborn = "0.12.2"
+matplotlib = "3.6.2"
+nanobind = "^2.2.0"
+python-dotenv = "^1.0.1"
+pytest = "^8.3.3"
+
+[[tool.poetry.packages]]
+include = "quark"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
