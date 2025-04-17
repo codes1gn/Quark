@@ -1,11 +1,9 @@
 from enum import Enum
 
 import numpy as np
-import tensorflow as tf
 import torch
 import torchvision
-from quark.common import *
-from tensorflow.data import Dataset as tfDataset
+from quark_engine.common import *
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
@@ -14,6 +12,31 @@ from .data_provider_base import *
 
 class TorchDataProvider(DataProviderBase):
     """Data provider for PyTorch, using torch DataLoader and common datasets."""
+
+    def __getitem__(self, index: int):
+        """Get the batch at a specific index."""
+        if isinstance(self.dataset, torch.utils.data.DataLoader):
+            # For PyTorch, we can directly access via DataLoader index
+            return self.dataset.dataset[index]  # Dataset within DataLoader
+
+    def __len__(self):
+        """Return the total number of batches."""
+        if isinstance(self.dataset, torch.utils.data.DataLoader):
+            return len(self.dataset)  # For PyTorch DataLoader
+        else:
+            raise ValueError("Unsupported dataset type for length calculation. ")
+
+    def generate_synthetic_data(self):
+        """Generate synthetic data for testing or default usage."""
+        DEBUG("self.input_shape = {} with type = {}".format(self.input_shape, type(self.input_shape)))
+        assert(isinstance(self.batch_size, int))
+        assert(isinstance(self.input_shape, (tuple, list)) and all(isinstance(x, int) for x in self.input_shape))
+        # TODO: compare and determine the rng method
+        inputs_data = np.random.rand(self.batch_size, *self.input_shape).astype(self.data_type.to_numpy()) 
+        labels_data = np.random.randint(0, 10, size=self.batch_size)
+        inputs = torch.from_numpy(inputs_data)
+        labels = torch.from_numpy(labels_data)
+        return inputs, labels
 
     def load_dataset(self, config: BenchmarkConfig):
         """Load a PyTorch dataset with DataLoader support."""

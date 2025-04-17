@@ -1,12 +1,13 @@
 [tool.poetry]
-name = "quark"
+name = "quark_engine"
 version = "0.1.0"
 description = "Query-based All-in-one Research Kit (PyTorch)"
 authors = ["Albert Shi <heng.shi@sjtu.edu.cn>"]
 license = "MIT"
 
+# cli name
 [tool.poetry.scripts]
-quark-engine = "quark_engine:main"
+quarkrt = "runtime.quark_engine_main:main"
 build-cpp = "build:main"
 
 [tool.poetry.dependencies]
@@ -34,8 +35,9 @@ nanobind = "^2.2.0"
 python-dotenv = "^1.0.1"
 pytest = "^8.3.3"
 
+# module name
 [[tool.poetry.packages]]
-include = "../quark-engine"
+include = "runtime"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

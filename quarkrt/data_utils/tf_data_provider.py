@@ -15,6 +15,25 @@ from .data_provider_base import *
 class TensorFlowDataProvider(DataProviderBase):
     """Data provider for TensorFlow framework, using tf.data.Dataset for common datasets."""
 
+    def __len__(self):
+        """Return the total number of batches."""
+        if isinstance(self.dataset, tf.data.Dataset):
+            return sum(1 for _ in self.dataset)  # For TensorFlow Dataset
+        else:
+            raise ValueError("Unsupported dataset type for length calculation. ")
+
+    def __getitem__(self, index: int):
+        """Get the batch at a specific index."""
+        if isinstance(self.dataset, tf.data.Dataset):
+            # For TensorFlow, we need to manually iterate to the index (or use a batching mechanism)
+            # TensorFlow's Dataset API doesn't natively support indexing, so we create an iterator
+            iter_dataset = iter(self.dataset)
+            for i, data in enumerate(iter_dataset):
+                if i == index:
+                    return data
+        else:
+            raise ValueError("Unsupported dataset type for getitem.")
+
     def load_dataset(self, config: BenchmarkConfig):
         """Load a TensorFlow dataset with tf.data.Dataset support."""
         if self.data_source == DataSourceEnum.SYNTHETIC:

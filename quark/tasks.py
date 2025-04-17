@@ -3,7 +3,10 @@ import os
 import sys
 import json
 from functools import wraps
-from invoke import task, Collection
+from invoke import task, Collection, Context
+
+from quark.utils import *
+from quark.common import *
 
 # Get the current Python version
 CURRENT_PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -12,92 +15,6 @@ print(f"python_version: {CURRENT_PYTHON_VERSION} (type: {type(CURRENT_PYTHON_VER
 #################################################################################
 ####  Helper Functions  ####
 #################################################################################
-
-def check_framework(func):
-    """
-    Decorator to check that the `framework` argument is either 'torch' or 'tensorflow'.
-    """
-    @wraps(func)
-    def wrapper(ctx, framework=None, *args, **kwargs):
-        if framework is None:
-            print("Error: The `framework` argument is required.")
-            print("       Use --framework='torch' or 'tensorflow' to specify.")
-            return
-
-        if framework not in ["torch", "tensorflow"]:
-            print(f"Error: Invalid framework '{framework}'. Must be 'torch' or 'tensorflow'.")
-            print(f"       use --framework='torch' or 'tensorflow' to specify.")
-            return
-
-        return func(ctx, framework=framework, *args, **kwargs)
-    return wrapper
-
-@task
-def get_venv_name(ctx, framework=None):
-    """
-    Generate the virtual environment name based on the Python version and framework.
-    """
-    framework_suffix = f"_{framework}" if framework else ""
-    return f"~/.venv/sandbox_py{CURRENT_PYTHON_VERSION.replace('.', '')}{framework_suffix}"
-
-def is_venv_active():
-    """
-    Check if a virtual environment is active.
-    """
-    return os.environ.get("VIRTUAL_ENV") is not None
-
-@check_framework
-def get_activate_cmd(ctx, framework=None):
-    """
-    Print instructions to activate the virtual environment in the current shell.
-    """
-    venv_name = get_venv_name(ctx, framework)
-    activate_script = "bin/activate" if os.name != "nt" else "Scripts/activate"
-    activate_path = os.path.join(venv_name, activate_script)
-    print(f"Activating virtualenv: source {activate_path}")
-    return f"source {activate_path}"
-
-def with_venv(func):
-    """
-    Decorator to ensure the task runs in a virtual environment.
-    """
-    @wraps(func)
-    def wrapper(ctx, *args, **kwargs):
-        if not is_venv_active():
-            if "framework" not in kwargs:
-                activate_cmd = get_activate_cmd(ctx, "tensorflow")
-            else:
-                activate_cmd = get_activate_cmd(ctx, kwargs.get("framework"))
-            with ctx.prefix(activate_cmd):
-                return func(ctx, *args, **kwargs)
-        return func(ctx, *args, **kwargs)
-    return wrapper
-
-def with_tf_venv(func):
-    """
-    Decorator to ensure the task runs in a virtual environment.
-    """
-    @wraps(func)
-    def wrapper(ctx, *args, **kwargs):
-        if not is_venv_active():
-            activate_cmd = get_activate_cmd(ctx, "tensorflow")
-            with ctx.prefix(activate_cmd):
-                return func(ctx, *args, **kwargs)
-        return func(ctx, *args, **kwargs)
-    return wrapper
-
-def with_torch_venv(func):
-    """
-    Decorator to ensure the task runs in a virtual environment.
-    """
-    @wraps(func)
-    def wrapper(ctx, *args, **kwargs):
-        if not is_venv_active():
-            activate_cmd = get_activate_cmd(ctx, "torch")
-            with ctx.prefix(activate_cmd):
-                return func(ctx, *args, **kwargs)
-        return func(ctx, *args, **kwargs)
-    return wrapper
 
 @task
 @check_framework
@@ -117,13 +34,13 @@ def link_config_file(ctx, framework=None):
         return
 
     # Create the symbolic link
-    symlink_path = "quark-engine/pyproject.toml"
+    symlink_path = "quarkrt/pyproject.toml"
     if os.path.exists(symlink_path) or os.path.islink(symlink_path):
         print(f"Removing existing {symlink_path}...")
         os.remove(symlink_path)
 
     print(f"Creating symbolic link: {symlink_path} -> {absolute_path}")
-    ctx.run(f"ln -s {absolute_path} {symlink_path}")
+    ctx.run(f"cp {absolute_path} {symlink_path}")
 
     print("Symbolic link created successfully.")
 
@@ -159,12 +76,24 @@ def install_deps(ctx, framework=None):
     """
     Install project dependencies using Poetry.
     """
-    if os.path.exists("quark-engine/pyproject.toml"):
-        ctx.run("rm quark-engine/pyproject.toml")
+    if os.path.exists("quarkrt/pyproject.toml"):
+        ctx.run("rm quarkrt/pyproject.toml")
     link_config_file(ctx, framework)
-    ctx.run("poetry lock --directory quark-engine/")
-    ctx.run("poetry install --directory quark-engine/ --no-root")
-    print("Project dependencies installed.")
+    with ctx.prefix("cd quarkrt/"):
+        ctx.run("poetry lock")
+        ctx.run("poetry install --no-root")
+        print("Project dependencies installed.")
+
+@task
+@check_framework
+def dry_run(ctx, framework=None):
+    if framework == "torch":
+        ctx.run("python scripts/check_torch.py")
+    elif framework == "tensorflow":
+        ctx.run("python scripts/check_tf.py")
+    else:
+        print("nothing happened in dry-run test")
+
 
 @task
 @check_framework
@@ -175,6 +104,7 @@ def bootstrap_impl(ctx, framework=None):
     create_env(ctx, framework) 
     config_poetry(ctx, framework) 
     install_deps(ctx, framework) 
+    dry_run(ctx, framework)
 
 @task
 @check_framework
@@ -184,12 +114,15 @@ def build_impl(ctx, framework=None):
     """
     activate_cmd = get_activate_cmd(ctx, framework=framework)
     with ctx.prefix(activate_cmd):
-        if os.path.exists("quark-engine/pyproject.toml"):
-            ctx.run("rm quark-engine/pyproject.toml")
+        if os.path.exists("quarkrt/pyproject.toml"):
+            ctx.run("rm quarkrt/pyproject.toml")
         link_config_file(ctx, framework)
-        ctx.run("poetry lock --directory quark-engine")
-        ctx.run("poetry install --directory quark-engine")
-        print(f"Project built for {framework}.")
+        with ctx.prefix("cd quarkrt/"):
+            ctx.run("poetry lock")
+            ctx.run("poetry build")
+            ctx.run("poetry install")
+            print(f"Project built for {framework}.")
+            ctx.run("python ../scripts/check_quarkrt.py")
 
 @task
 def clean(ctx):
@@ -217,12 +150,44 @@ def test(ctx):
     """
     # Run pytest
     ctx.run("pytest tests/unittests/Common")
+    ctx.run("pytest tests/unittests/Benchmark/test_timer.py")
+    quark_engine_test(ctx)
 
+#################################################################################
+####  Impl for benchmark  ####
+#################################################################################
+
+from dataclasses import dataclass
+
+@dataclass
+class Argument:
+    label: str = ""
+    config_dir: str = "experiments"
+    ctx: Context = None
+
+@task
+def bench(ctx, label=""):
+    from quark.benchmark import BenchmarkCollector
+    enable_trace()
+    print("Starting benchmark collection and execution...")
+    arg = Argument()
+    arg.label = label
+    arg.ctx = ctx
+    TRACE(f"arguments = {arg}")
+    collector = BenchmarkCollector(arguments=arg, config_dir=arg.config_dir)
+    collector.bench()
+
+@task
+@with_torch_venv
+def quark_engine_test(ctx):
+    ctx.run("quarkrt")
 
 #################################################################################
 ####  Framework-Specific Tasks  ####
 #################################################################################
 
+# TODO: support --platform=torch/tensorflow/catz and make all by default
+# TODO: let filter by platforms supported only
 @task
 def bootstrap(ctx):
     """Bootstrap a PyTorch environment."""
@@ -231,7 +196,6 @@ def bootstrap(ctx):
 
 @task
 def build(ctx):
-    """Build the project in the PyTorch environment."""
     build_impl(ctx, framework="torch")
     build_impl(ctx, framework="tensorflow")
 
@@ -241,4 +205,5 @@ namespace = Collection(
     build,
     clean,
     test,
+    bench,
 )
