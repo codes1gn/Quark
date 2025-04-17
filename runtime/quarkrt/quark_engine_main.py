@@ -5,7 +5,7 @@ from pathlib import Path
 
 # from .benchmark.benchmark_collector import BenchmarkCollector
 # from quark_engine.data_utils.data_provider_builder import DataProviderBuilder
-from runtime.common import *
+from quarkrt.common import *
 
 warnings.filterwarnings("ignore")
 

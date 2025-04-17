@@ -1,4 +1,4 @@
-import runtime 
-import runtime.common
-from runtime.common import *
-print("test passed")
+import quarkrt 
+import quarkrt.common
+from quarkrt.common import *
+print("quark runtime library test passed")

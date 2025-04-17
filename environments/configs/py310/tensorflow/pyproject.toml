@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "quark_engine"
+name = "quarkrt"
 version = "0.1.0"
 description = "Query-based All-in-one Research Kit (TensorFlow)"
 authors = ["Albert Shi <heng.shi@sjtu.edu.cn>"]
@@ -7,7 +7,7 @@ license = "MIT"
 
 # cli name
 [tool.poetry.scripts]
-quarkrt = "runtime.quark_engine_main:main"
+quark-runtime = "runtime.quark_engine_main:main"
 build-cpp = "build:main"
 
 [tool.poetry.dependencies]

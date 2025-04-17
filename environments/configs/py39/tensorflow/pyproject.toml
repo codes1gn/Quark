@@ -7,7 +7,7 @@ license = "MIT"
 
 # cli name
 [tool.poetry.scripts]
-quarkrt = "runtime.quark_engine_main:main"
+quark-runtime = "quarkrt.quark_engine_main:main"
 build-cpp = "build:main"
 
 [tool.poetry.dependencies]
@@ -32,7 +32,7 @@ pytest = "^8.3.3"
 
 # module name
 [[tool.poetry.packages]]
-include = "runtime"
+include = "quarkrt"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

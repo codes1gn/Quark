@@ -34,7 +34,7 @@ def link_config_file(ctx, framework=None):
         return
 
     # Create the symbolic link
-    symlink_path = "quarkrt/pyproject.toml"
+    symlink_path = "runtime/pyproject.toml"
     if os.path.exists(symlink_path) or os.path.islink(symlink_path):
         print(f"Removing existing {symlink_path}...")
         os.remove(symlink_path)
@@ -72,20 +72,21 @@ def config_poetry(ctx, framework=None):
 @task
 @check_framework
 @with_venv
-def install_deps(ctx, framework=None):
+def install_impl(ctx, framework=None):
     """
     Install project dependencies using Poetry.
     """
-    if os.path.exists("quarkrt/pyproject.toml"):
-        ctx.run("rm quarkrt/pyproject.toml")
+    if os.path.exists("runtime/pyproject.toml"):
+        ctx.run("rm runtime/pyproject.toml")
     link_config_file(ctx, framework)
-    with ctx.prefix("cd quarkrt/"):
+    with ctx.prefix("cd runtime/"):
         ctx.run("poetry lock")
-        ctx.run("poetry install --no-root")
+        ctx.run("poetry install")
         print("Project dependencies installed.")
 
 @task
 @check_framework
+@with_venv
 def dry_run(ctx, framework=None):
     if framework == "torch":
         ctx.run("python scripts/check_torch.py")
@@ -103,8 +104,6 @@ def bootstrap_impl(ctx, framework=None):
     """
     create_env(ctx, framework) 
     config_poetry(ctx, framework) 
-    install_deps(ctx, framework) 
-    dry_run(ctx, framework)
 
 @task
 @check_framework
@@ -114,15 +113,13 @@ def build_impl(ctx, framework=None):
     """
     activate_cmd = get_activate_cmd(ctx, framework=framework)
     with ctx.prefix(activate_cmd):
-        if os.path.exists("quarkrt/pyproject.toml"):
-            ctx.run("rm quarkrt/pyproject.toml")
+        if os.path.exists("runtime/pyproject.toml"):
+            ctx.run("rm runtime/pyproject.toml")
         link_config_file(ctx, framework)
-        with ctx.prefix("cd quarkrt/"):
+        with ctx.prefix("cd runtime/"):
             ctx.run("poetry lock")
             ctx.run("poetry build")
-            ctx.run("poetry install")
             print(f"Project built for {framework}.")
-            ctx.run("python ../scripts/check_quarkrt.py")
 
 @task
 def clean(ctx):
@@ -141,17 +138,6 @@ def clean(ctx):
     print(f"Deleting '{venv_dir}'...")
     ctx.run(f"rm -rf {venv_dir}")
     print("Done.")
-
-@task
-@with_torch_venv
-def test(ctx):
-    """
-    Run the test suite using pytest.
-    """
-    # Run pytest
-    ctx.run("pytest tests/unittests/Common")
-    ctx.run("pytest tests/unittests/Benchmark/test_timer.py")
-    quark_engine_test(ctx)
 
 #################################################################################
 ####  Impl for benchmark  ####
@@ -180,7 +166,7 @@ def bench(ctx, label=""):
 @task
 @with_torch_venv
 def quark_engine_test(ctx):
-    ctx.run("quarkrt")
+    ctx.run("quark-runtime")
 
 #################################################################################
 ####  Framework-Specific Tasks  ####
@@ -195,13 +181,33 @@ def bootstrap(ctx):
     bootstrap_impl(ctx, framework="tensorflow")
 
 @task
+def install(ctx):
+    install_impl(ctx, framework="torch")
+    install_impl(ctx, framework="tensorflow")
+
+@task
 def build(ctx):
     build_impl(ctx, framework="torch")
     build_impl(ctx, framework="tensorflow")
 
+@task
+@with_torch_venv
+def test(ctx):
+    """
+    Run the test suite using pytest.
+    """
+    # Run pytest
+    dry_run(ctx, "torch")
+    dry_run(ctx, "tensorflow")
+    ctx.run("pytest tests/unittests/Common")
+    ctx.run("pytest tests/unittests/Benchmark/test_timer.py")
+    ctx.run("python scripts/check_quarkrt.py")
+    quark_engine_test(ctx)
+
 # Create a namespace for the tasks
 namespace = Collection(
     bootstrap,
+    install,
     build,
     clean,
     test,
