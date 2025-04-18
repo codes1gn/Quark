@@ -15,9 +15,15 @@ mkdocs-markdownextradata-plugin = "^0.2.6"
 numpy = "1.23.4"
 pytest = "^8.3.5"
 pydantic = "^2.11.3"
+# quark_utility = { path = "quark_utility", develop = true }
 
 [[tool.poetry.packages]]
 include = "quark"
+
+[[tool.poetry.packages]]
+include = "quark_utility"
+# { include = "quark", from = "." }
+# { include = "quark_utility", from = "." }
 
 [tool.poetry.scripts]
 quark = "quark.quark_main:program.run"

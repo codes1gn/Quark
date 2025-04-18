@@ -4,7 +4,7 @@
 from enum import Enum
 
 import pytest
-from quark.common import *
+from quark_utility import *
 
 
 @pytest.fixture

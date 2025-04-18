@@ -100,7 +100,7 @@ class Runner:
         record = Record(config=self.config, summary=self.timer.summary())
         TRACE(f"Bench Record:\n{record.stringify()}")
 
-        self.results.update(record.summary.to_dict())
+        self.results.update(record.summary)
         self._save_results()
 
     def _save_results(self, serializer=None):

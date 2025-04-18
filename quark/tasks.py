@@ -5,8 +5,10 @@ import json
 from functools import wraps
 from invoke import task, Collection, Context
 
-from quark.utils import *
-from quark.common import *
+from quark_utility import *
+from dataclasses import dataclass
+from quark import BenchCoordinator
+
 
 # Get the current Python version
 CURRENT_PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -89,9 +91,9 @@ def install_impl(ctx, framework=None):
 @with_venv
 def dry_run(ctx, framework=None):
     if framework == "torch":
-        ctx.run("python scripts/check_torch.py")
+        ctx.run("python tests/smoke_tests/check_torch.py")
     elif framework == "tensorflow":
-        ctx.run("python scripts/check_tf.py")
+        ctx.run("python tests/smoke_tests/check_tf.py")
     else:
         print("nothing happened in dry-run test")
 
@@ -143,8 +145,6 @@ def clean(ctx):
 ####  Impl for benchmark  ####
 #################################################################################
 
-from dataclasses import dataclass
-
 @dataclass
 class Argument:
     label: str = ""
@@ -153,7 +153,6 @@ class Argument:
 
 @task
 def bench(ctx, label=""):
-    from quark import BenchCoordinator
     enable_trace()
     print("Starting benchmark collection and execution...")
     arg = Argument()
@@ -197,12 +196,13 @@ def test(ctx):
     Run the test suite using pytest.
     """
     # Run pytest
-    # dry_run(ctx, "torch")
-    # dry_run(ctx, "tensorflow")
-    # ctx.run("pytest tests/unittests/Common")
+    dry_run(ctx, "torch")
+    dry_run(ctx, "tensorflow")
+    ctx.run("pytest tests/unittests/Common")
     # ctx.run("pytest tests/unittests/Benchmark/test_timer.py")
-    # ctx.run("python scripts/check_quarkrt.py")
+    ctx.run("python tests/smoke_tests/check_quarkrt.py")
     quark_engine_test(ctx)
+#TODO: template to create tasks, with comments for prompting
 
 # Create a namespace for the tasks
 namespace = Collection(

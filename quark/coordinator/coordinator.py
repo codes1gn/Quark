@@ -4,9 +4,7 @@ import time
 from typing import List
 
 import yaml
-from quark.benchmark import *
-from quark.common import *
-from quark.utils import *
+from quark_utility import *
 
 from invoke import tasks, Context
 
@@ -46,7 +44,7 @@ class BenchCoordinator:
         config = self.decode(task_file)
         label = config.label
         print(f"\nProcessing task {idx}/{total_tasks}: {label}")
-        self.run(self.arguments.ctx, task_file)
+        run(self.arguments.ctx, task_file)
 
     def run_benchmarks(self):
         total_tasks = len(self.config_files)
@@ -59,16 +57,17 @@ class BenchCoordinator:
     def bench(self):
         self.run_benchmarks()
 
-    @with_venv
-    def run(self, ctx: Context, task_file: str, num_iterations: int = 10):
-        """
-        Run the benchmark by executing the workload with the data provider and timing it.
+@task
+@with_venv
+def run(ctx: Context, task_file: str, num_iterations: int = 10):
+    """
+    Run the benchmark by executing the workload with the data provider and timing it.
 
-        Args:
-            num_iterations (int): The number of iterations to run the benchmark for.
-        """
-        TRACE("Dispatch task {}".format(task_file))
-        cmd = f"quark-runtime --bench --task={task_file} --trace"
-        TRACE("Running cmd = {}".format(cmd))
-        ctx.run(cmd)
+    Args:
+        num_iterations (int): The number of iterations to run the benchmark for.
+    """
+    TRACE("Dispatch task {}".format(task_file))
+    cmd = f"quark-runtime --bench --task={task_file} --trace"
+    TRACE("Running cmd = {}".format(cmd))
+    ctx.run(cmd)
 

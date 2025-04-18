@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument(
         '--task', 
         type=str, 
-        default="benchmarks", 
+        default="experiments/inference/1.yml", 
         help="Directory containing benchmark configuration files (default: 'benchmarks')"
     )
     parser.add_argument(
@@ -83,9 +83,8 @@ def main():
 
     runner = Runner(config)
     runner.run()
-    results = benchmark.get_results()
-    summary = results["summary"]
-    print(f"Summary for task {label}: {summary}")
+    # results = runner.get_results()
+    # print(f"Summary for task {config.label}: {results}")
 
     # progress = (idx) / total_tasks * 100
     # print(f"Progress: {progress:.2f}%")
