@@ -1,23 +1,14 @@
 
 import json
 import os
-from dataclasses import dataclass, field
-
+from dataclasses import dataclass, field, asdict
 import yaml
+
 from quarkrt.common import *
 from quarkrt.data_utils import DataProviderBase, DataProviderBuilder
 from quarkrt.executor import ExecutorBase, ExecutorBuilder
 from quarkrt.workload import WorkloadBase, WorkloadBuilder
-
 from .timer import *
-
-
-def numpy_serializer(obj):
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    elif isinstance(obj, np.generic):
-        return obj.item()
-    raise TypeError(f"Type {type(obj)} not serializable")
 
 
 # TODO: clear out unused fields, like timer_type
@@ -38,8 +29,6 @@ class Runner:
         self.executor = ExecutorBuilder.build(self.config)
         self.workload = WorkloadBuilder.build(self.config)
         self.data_provider = DataProviderBuilder.build(self.config) 
-        # self.executor.set_workload(self.workload)
-        # self.executor.set_data_provider(self.data_provider)
         self.results = {}
         assert(self._validate())
 
@@ -76,29 +65,58 @@ class Runner:
         # Store summary of the benchmark run
         self._store_summary()
 
+    # def _store_summary(self):
+    #     """
+    #     Store the benchmark summary (execution time, iterations) into the results.
+    #     """
+    #     TRACE("Store Benchmark Results on task {}".format(self.config.label))
+    #     # TODO: make a standalone summary class, make it dataclass
+    #     self.results['mean_time'] = self.timer.mean_time()
+    #     self.results['std_dev'] = self.timer.std_dev()
+    #     self.results['summary'] = self.timer.summary()
+    #     TRACE("Bench Summary:\n{}".format(self.results))
+
+    #     # Save the results to a YAML file
+    #     self._save_to_json()
+
+    # def _save_to_json(self):
+    #     # varying label and logging path with init, if create from benchmark collector
+    #     result_file = self.logging_path + self.config.label + '.json'
+    #     print("save to results file {}".format(result_file))
+
+    #     os.makedirs(os.path.dirname(result_file), exist_ok=True)
+
+    #     with open(result_file, 'w') as file:
+    #         json.dump(self.results, file, default=numpy_serializer, indent=4, ensure_ascii=False)
+
+    #     TRACE(f"Benchmark results saved to {result_file}")
     def _store_summary(self):
         """
         Store the benchmark summary (execution time, iterations) into the results.
         """
-        TRACE("Store Benchmark Results on task {}".format(self.config.label))
-        # TODO: make a standalone summary class, make it dataclass
-        self.results['mean_time'] = self.timer.mean_time()
-        self.results['std_dev'] = self.timer.std_dev()
-        self.results['summary'] = self.timer.summary()
-        TRACE("Bench Summary:\n{}".format(self.results))
+        TRACE(f"Store Benchmark Results on task {self.config.label}")
 
-        # Save the results to a YAML file
-        self._save_to_json()
+        # Create a Summary object
+        record = Record(config=self.config, summary=self.timer.summary())
+        TRACE(f"Bench Record:\n{record.stringify()}")
 
-    def _save_to_json(self):
-        # varying label and logging path with init, if create from benchmark collector
-        result_file = self.logging_path + self.config.label + '.json'
-        print("save to results file {}".format(result_file))
+        self.results.update(record.summary.to_dict())
+        self._save_results()
 
+    def _save_results(self, serializer=None):
+        """
+        Save the results to a file in JSON format.
+        :param serializer: Custom serializer function for non-serializable objects.
+        """
+        result_file = os.path.join(self.logging_path, f"{self.config.label}.json")
+        print(f"Saving results to file: {result_file}")
+
+        # Ensure the directory exists
         os.makedirs(os.path.dirname(result_file), exist_ok=True)
 
-        with open(result_file, 'w') as file:
-            json.dump(self.results, file, default=numpy_serializer, indent=4, ensure_ascii=False)
+        # Save to JSON file
+        with open(result_file, "w") as file:
+            json.dump(self.results, file, default=serializer, indent=4, ensure_ascii=False)
 
         TRACE(f"Benchmark results saved to {result_file}")
 

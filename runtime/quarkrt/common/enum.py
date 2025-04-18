@@ -4,7 +4,6 @@
 from dataclasses import dataclass
 from enum import Enum, EnumMeta
 from typing import List, Literal, Optional, Union
-
 import yaml
 from pydantic import BaseModel, ValidationError, field_validator
 

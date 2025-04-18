@@ -1,19 +1,21 @@
 import ast
 import itertools
+import json
 import re
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field, asdict
 from pprint import pformat
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union
-
 import numpy as np
 import yaml
 from pydantic import (BaseModel, ValidationError, field_validator,
                       root_validator)
 
 from .enum import *
+from .serialise import *
 
 
+@dataclass
 class OperatorConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum  # Must be "operator"
@@ -25,6 +27,7 @@ class OperatorConfig(BaseModel):
             raise ValueError('source must be SYNTHETIC')
         return v
 
+@dataclass
 class ModelConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum
@@ -36,6 +39,7 @@ class ModelConfig(BaseModel):
             raise ValueError('source must be SYNTHETIC')
         return v
 
+@dataclass
 class FusedOperatorConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum
@@ -50,6 +54,7 @@ class FusedOperatorConfig(BaseModel):
 # ---------------------------
 # Define Executor configuration as a nested model
 # ---------------------------
+@dataclass
 class ExecutorConfig(BaseModel):
     framework: FrameworkEnum
     device: DeviceEnum
@@ -59,6 +64,7 @@ class ExecutorConfig(BaseModel):
 # For "synthetic" type, both input_shape and batch_size are required.
 # For concrete datasets (like "cifar10", "mnist"), only batch_size is needed.
 # ---------------------------
+@dataclass
 class SyntheticDatasetConfig(BaseModel):
     source: DataSourceEnum
     input_shape: List[int]
@@ -80,6 +86,7 @@ class SyntheticDatasetConfig(BaseModel):
     def input_shape(self, value):
         self._input_shape = value
 
+@dataclass
 class ConcreteDatasetConfig(BaseModel):
     source: DataSourceEnum
     batch_size: int
@@ -109,6 +116,7 @@ WorkloadConfig = Union[OperatorConfig, ModelConfig, FusedOperatorConfig]
 # Define Experiment configuration model
 # ---------------------------
 # TODO: mock or pretrained
+@dataclass
 class ExperimentConfig(BaseModel):
     run_mode: RunModeEnum
     executor: ExecutorConfig
@@ -117,11 +125,36 @@ class ExperimentConfig(BaseModel):
 # ---------------------------
 # Define top-level configuration model integrating workload and experiment configurations
 # ---------------------------
+@dataclass
 class BenchmarkConfig(BaseModel):
     label: str
     workload: WorkloadConfig
     experiment: ExperimentConfig
     dataset: DatasetConfig
+
+@dataclass
+class Record:
+    config: BenchmarkConfig
+    summary: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert the summary object to a dictionary."""
+        return asdict(self)
+
+    def stringify(self, format="json", indent=2) -> str:
+        """
+        Pretty print the summary in the specified format.
+        :param format: Output format ("json" or "str").
+        :param indent: Indentation level for JSON format.
+        :return: Formatted string representation of the summary.
+        """
+        if format == "json":
+            return json.dumps({"config": self.config.model_dump(),
+                               "summary": self.summary}, default=enum_serializer, indent=indent, ensure_ascii=False)
+        elif format == "str":
+            return "\n".join([f"{key}: {value}" for key, value in self.to_dict().items()])
+        else:
+            raise ValueError(f"Unsupported format: {format}")
 
 class ConfigBuilder:
 
