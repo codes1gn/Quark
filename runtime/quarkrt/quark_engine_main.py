@@ -3,8 +3,10 @@ import warnings
 import sys
 from pathlib import Path
 
-# from .benchmark.benchmark_collector import BenchmarkCollector
-# from quark_engine.data_utils.data_provider_builder import DataProviderBuilder
+from quarkrt import Runner 
+from quarkrt import ExecutorBuilder
+from quarkrt import WorkloadBuilder
+from quarkrt import DataProviderBuilder
 from quarkrt.common import *
 
 warnings.filterwarnings("ignore")
@@ -17,7 +19,7 @@ def parse_args():
         help="Run all benchmarks from the benchmark directory"
     )
     parser.add_argument(
-        '--config-dir', 
+        '--task', 
         type=str, 
         default="benchmarks", 
         help="Directory containing benchmark configuration files (default: 'benchmarks')"
@@ -35,10 +37,59 @@ def parse_args():
         default=None,
         help="Run the benchmark with the specified filtering tag"
     )
+    parser.add_argument("--trace", action="store_true", help="Enable trace logging")
+    parser.add_argument("--debug", action="store_true", help="Enable debug-level trace logging")
+    parser.add_argument("--torch", action="store_true", help="Enable torch support")
+    parser.add_argument("--tensorflow", action="store_true", help="Enable tensorflow support")
+    return parser.parse_args()
     return parser.parse_args()
 
 def main():
-    print("smoke test")
+    args = parse_args()
+
+    if args.task:
+        TRACE(f"task = {args.task}")
+        config = ConfigBuilder.load_config(args.task)
+        TRACE(f"config = \n{config}")
+
+    if args.trace:
+        enable_trace()
+    else:
+        disable_trace()
+
+    if args.debug:
+        enable_debug()
+    else:
+        disable_debug()
+
+    if args.torch:
+        enable_torch_support()
+    else:
+        disable_torch_support()
+
+    if args.tensorflow:
+        enable_tf_support()
+    else:
+        disable_tf_support()
+
+    # data = DataProviderBuilder.build(config)
+    # TRACE(f"DATA = {data}\n")
+    #
+    # workload = WorkloadBuilder.build(config)
+    # TRACE(f"LOAD = {workload}\n")
+    #
+    # executor = ExecutorBuilder.build(config)
+    # TRACE(f"EX = {executor}\n")
+
+    runner = Runner(config)
+    runner.run()
+    results = benchmark.get_results()
+    summary = results["summary"]
+    print(f"Summary for task {label}: {summary}")
+
+    # progress = (idx) / total_tasks * 100
+    # print(f"Progress: {progress:.2f}%")
+        
 
 if __name__ == "__main__":
     main()

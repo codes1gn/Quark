@@ -140,3 +140,10 @@ class ConfigBuilder:
         except Exception as e:
             print("Configuration error:", e)
 
+def numpy_serializer(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, np.generic):
+        return obj.item()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
