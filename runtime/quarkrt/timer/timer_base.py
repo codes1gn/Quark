@@ -3,7 +3,7 @@ import timeit
 from enum import Enum
 import numpy as np
 
-from quarkrt.common import *
+from quark_utility import *
 
 
 class TimerBase:

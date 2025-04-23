@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
 
-from quarkrt.common import *
+from quark_utility import *
 from quarkrt.data_utils import *
 
 __all__ = [

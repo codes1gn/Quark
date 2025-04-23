@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 
 import tensorflow as tf
-from quarkrt.common import DeviceEnum, RunModeEnum
+from quark_utility import DeviceEnum, RunModeEnum
 
 from .executor_base import ExecutorBase
 

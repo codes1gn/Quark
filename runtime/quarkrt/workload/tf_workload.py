@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import tensorflow as tf
 
-from quarkrt.common.enum import *
+from quark_utility.enum import *
 from quarkrt.workload.workload_base import *
 
 

@@ -1,6 +1,6 @@
 # workload/workload_builder.py
 
-from quarkrt.common import *
+from quark_utility import *
 from quarkrt.workload.workload_base import WorkloadBase
 
 

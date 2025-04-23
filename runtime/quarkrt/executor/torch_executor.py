@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 
 import torch
-from quarkrt.common import *
+from quark_utility import *
 from quarkrt.data_utils import DataProviderBase
 from quarkrt.workload import WorkloadBase
 

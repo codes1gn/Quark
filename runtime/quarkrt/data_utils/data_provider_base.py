@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 import numpy as np
-from quarkrt.common import *
+from quark_utility import *
 
 
 @dataclass

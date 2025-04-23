@@ -7,7 +7,7 @@ from quarkrt import Runner
 from quarkrt import ExecutorBuilder
 from quarkrt import WorkloadBuilder
 from quarkrt import DataProviderBuilder
-from quarkrt.common import *
+from quark_utility import *
 
 warnings.filterwarnings("ignore")
 

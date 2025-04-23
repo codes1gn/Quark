@@ -24,6 +24,7 @@ torch = "2.0.0"
 torchvision = "0.15.1"
 torchaudio = "2.0.1"
 torchtext = "0.15.1"
+quark_utility = { path = "../utility", develop = true }
 
 # module name
 [[tool.poetry.packages]]

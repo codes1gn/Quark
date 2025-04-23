@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 
-from quarkrt.common import *
+from quark_utility import *
 from quarkrt.workload.workload_base import *
 
 

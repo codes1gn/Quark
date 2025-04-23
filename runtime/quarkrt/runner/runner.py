@@ -4,11 +4,11 @@ import os
 from dataclasses import dataclass, field, asdict
 import yaml
 
-from quarkrt.common import *
+from quark_utility import *
 from quarkrt.data_utils import DataProviderBase, DataProviderBuilder
 from quarkrt.executor import ExecutorBase, ExecutorBuilder
 from quarkrt.workload import WorkloadBase, WorkloadBuilder
-from .timer import *
+from quarkrt.timer import *
 
 
 # TODO: clear out unused fields, like timer_type

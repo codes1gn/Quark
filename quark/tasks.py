@@ -1,4 +1,5 @@
 from platform import python_version
+from pathlib import Path
 import os
 import sys
 import json
@@ -13,6 +14,9 @@ from quark import BenchCoordinator
 # Get the current Python version
 CURRENT_PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
 print(f"python_version: {CURRENT_PYTHON_VERSION} (type: {type(CURRENT_PYTHON_VERSION)})")
+
+# Get root project dir
+root_dir = Path(__file__).resolve().parent.parent
 
 #################################################################################
 ####  Helper Functions  ####
@@ -90,10 +94,12 @@ def install_impl(ctx, framework=None):
 @check_framework
 @with_venv
 def dry_run(ctx, framework=None):
+    torch_test = root_dir / "tests/smoke_tests/check_torch.py"
+    tf_test = root_dir / "tests/smoke_tests/check_tf.py"
     if framework == "torch":
-        ctx.run("python tests/smoke_tests/check_torch.py")
+        ctx.run(f"python {torch_test}")
     elif framework == "tensorflow":
-        ctx.run("python tests/smoke_tests/check_tf.py")
+        ctx.run(f"python {tf_test}")
     else:
         print("nothing happened in dry-run test")
 
@@ -195,12 +201,14 @@ def test(ctx):
     """
     Run the test suite using pytest.
     """
+    # TODO: consider add path handle to utility
+    unittest_path = root_dir / "tests/unittests/Common"
+    smoke_test_path = root_dir / "tests/smoke_tests/check_quarkrt.py"
     # Run pytest
     dry_run(ctx, "torch")
     dry_run(ctx, "tensorflow")
-    ctx.run("pytest tests/unittests/Common")
-    # ctx.run("pytest tests/unittests/Benchmark/test_timer.py")
-    ctx.run("python tests/smoke_tests/check_quarkrt.py")
+    ctx.run(f"python {smoke_test_path}")
+    ctx.run(f"pytest {unittest_path}")
     quark_engine_test(ctx)
 #TODO: template to create tasks, with comments for prompting
 

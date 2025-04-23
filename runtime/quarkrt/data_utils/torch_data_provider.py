@@ -5,7 +5,7 @@ import torchvision
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-from quarkrt.common import *
+from quark_utility import *
 from .data_provider_base import *
 
 

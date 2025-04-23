@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
-from quarkrt.common import *
+from quark_utility import *
 from quarkrt.data_utils import DataProviderBase
 from quarkrt.workload import WorkloadBase
 

@@ -1,4 +1,3 @@
 import quarkrt 
-import quarkrt.common
-from quarkrt.common import *
+import quark_utility 
 print("quark runtime library test passed")

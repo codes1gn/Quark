@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.data import Dataset as tfDataset
 
-from quarkrt.common import *
+from quark_utility import *
 from .data_provider_base import *
 
 

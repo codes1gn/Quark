@@ -6,7 +6,7 @@ from typing import List
 import yaml
 from quark_utility import *
 
-from invoke import tasks, Context
+from invoke import task, Context
 
 
 class BenchCoordinator:

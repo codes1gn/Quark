@@ -3,7 +3,7 @@ import timeit
 from enum import Enum
 import numpy as np
 
-from quarkrt.common import *
+from quark_utility import *
 from .timer_base import TimerBase
 
 # default version of timer for benchmark, use it if not use specific ones
