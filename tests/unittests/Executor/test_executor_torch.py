@@ -1,15 +1,16 @@
 # tests/test_executor.py
 # RUN: python -m pytest -q -v --tb=short %s
+import os
+os.environ["TOR_SUPPORTED"] = "1"
 
 import pytest
-import tensorflow as tf
 import torch
-from quark.common import *
-from quark.data_utils import DataProviderBase, DataProviderBuilder
-from quark.executor import ExecutorBuilder
-from quark.workload import \
+from quark_utility import *
+from quarkrt.data_utils import DataProviderBase, DataProviderBuilder
+from quarkrt.executor import ExecutorBuilder
+from quarkrt.workload import \
     WorkloadBuilder  # Assuming you have a WorkloadBuilder class
-from quark.workload import WorkloadBase
+from quarkrt.workload import WorkloadBase
 
 
 @pytest.fixture
@@ -54,3 +55,4 @@ def test_torch_executor_device(test_config, device: DeviceEnum):
         if torch.cuda.is_available():
             assert device_info == torch.device("cuda")
 
+os.environ.pop("TORCH_SUPPORTED", None)

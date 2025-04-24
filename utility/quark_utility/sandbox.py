@@ -42,14 +42,23 @@ def with_venv(func):
     """
     @wraps(func)
     def wrapper(ctx, *args, **kwargs):
-        if not is_venv_active():
-            if "framework" not in kwargs:
-                activate_cmd = get_activate_cmd(ctx, "tensorflow")
-            else:
-                activate_cmd = get_activate_cmd(ctx, kwargs.get("framework"))
-            with ctx.prefix(activate_cmd):
-                return func(ctx, *args, **kwargs)
-        return func(ctx, *args, **kwargs)
+        try:
+            if not is_venv_active():
+                if "framework" not in kwargs:
+                    activate_cmd = get_activate_cmd(ctx, "tensorflow")
+                    os.environ["TF_SUPPORTED"] = "1"
+                else:
+                    activate_cmd = get_activate_cmd(ctx, kwargs.get("framework"))
+                    if kwargs.get("framework") == "tensorflow":
+                        os.environ["TF_SUPPORTED"] = "1"
+                    elif kwargs.get("framework") == "torch":
+                        os.environ["TORCH_SUPPORTED"] = "1"
+                with ctx.prefix(activate_cmd):
+                    return func(ctx, *args, **kwargs)
+            return func(ctx, *args, **kwargs)
+        finally:
+            os.environ.pop("TF_SUPPORTED", None)
+            os.environ.pop("TORCH_SUPPORTED", None)
     return wrapper
 
 def with_tf_venv(func):

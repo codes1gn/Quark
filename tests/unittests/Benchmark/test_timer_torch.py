@@ -1,9 +1,11 @@
 # RUN: python -m pytest -q --tb=short %s
+import os
+os.environ["TOR_SUPPORTED"] = "1"
 
 import numpy as np
 import pytest
 import torch
-from quark.benchmark.timer import *
+from quarkrt.timer import *
 
 
 def dummy_function():
@@ -95,3 +97,4 @@ def test_timer_one_arg(timer_type, repeat_samples, warmup_samples):
     assert summary['confidence_interval'][0] <= summary['mean_time'] <= summary['confidence_interval'][1], \
         "Mean should be within the confidence interval"
 
+os.environ.pop("TORCH_SUPPORTED", None)

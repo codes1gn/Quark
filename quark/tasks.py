@@ -171,6 +171,9 @@ def bench(ctx, label=""):
 @task
 @with_torch_venv
 def quark_engine_test(ctx):
+    # TODO: make the workspace fixed is not a good idea, but invoke quark test from
+    # non project's root can cause issue now
+    # TODO: need arguments handler
     ctx.run("quark-runtime")
 
 #################################################################################
@@ -196,21 +199,59 @@ def build(ctx):
     build_impl(ctx, framework="tensorflow")
 
 @task
-@with_torch_venv
 def test(ctx):
     """
     Run the test suite using pytest.
     """
     # TODO: consider add path handle to utility
-    unittest_path = root_dir / "tests/unittests/Common"
-    smoke_test_path = root_dir / "tests/smoke_tests/check_quarkrt.py"
-    # Run pytest
     dry_run(ctx, "torch")
     dry_run(ctx, "tensorflow")
-    ctx.run(f"python {smoke_test_path}")
-    ctx.run(f"pytest {unittest_path}")
+    smoke_test(ctx)
+    unittest(ctx)
     quark_engine_test(ctx)
 #TODO: template to create tasks, with comments for prompting
+
+@task
+@with_torch_venv
+def smoke_test(ctx):
+    smoke_test = root_dir / "tests/smoke_tests/check_quarkrt.py"
+    ctx.run(f"python {smoke_test}")
+
+@task
+@with_torch_venv
+def unittest_torch(ctx):
+    """
+    Run all PyTorch workload unit tests matching *_torch.py
+    """
+    test_dir = root_dir / "tests/unittests"
+    test_files = list(test_dir.rglob("*_torch.py"))
+    if not test_files:
+        print("No PyTorch workload tests found.")
+        return
+    for test_file in test_files:
+        ctx.run(f"pytest {test_file}")
+
+@task
+@with_tf_venv
+def unittest_tf(ctx):
+    """
+    Run all TensorFlow workload unit tests matching *_tf.py
+    """
+    test_dir = root_dir / "tests/unittests"
+    test_files = list(test_dir.rglob("*_tf.py"))
+    if not test_files:
+        print("No TensorFlow workload tests found.")
+        return
+    for test_file in test_files:
+        ctx.run(f"pytest {test_file}")
+
+@task
+def unittest(ctx):
+    """
+    Run the test suite using pytest.
+    """
+    unittest_tf(ctx)
+    unittest_torch(ctx)
 
 # Create a namespace for the tasks
 namespace = Collection(
@@ -220,4 +261,5 @@ namespace = Collection(
     clean,
     test,
     bench,
+    unittest,
 )

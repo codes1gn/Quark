@@ -1,4 +1,5 @@
 import torch
+from .timer_base import TimerBase
 
 class PyTorchTimer(TimerBase):
     """Timer using PyTorch's cuda event-based timing, suitable for GPU operations."""

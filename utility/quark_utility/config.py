@@ -15,7 +15,6 @@ from .enum import *
 from .serialise import *
 
 
-@dataclass
 class OperatorConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum  # Must be "operator"
@@ -27,7 +26,6 @@ class OperatorConfig(BaseModel):
             raise ValueError('source must be SYNTHETIC')
         return v
 
-@dataclass
 class ModelConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum
@@ -39,7 +37,6 @@ class ModelConfig(BaseModel):
             raise ValueError('source must be SYNTHETIC')
         return v
 
-@dataclass
 class FusedOperatorConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum
@@ -54,7 +51,6 @@ class FusedOperatorConfig(BaseModel):
 # ---------------------------
 # Define Executor configuration as a nested model
 # ---------------------------
-@dataclass
 class ExecutorConfig(BaseModel):
     framework: FrameworkEnum
     device: DeviceEnum
@@ -64,7 +60,6 @@ class ExecutorConfig(BaseModel):
 # For "synthetic" type, both input_shape and batch_size are required.
 # For concrete datasets (like "cifar10", "mnist"), only batch_size is needed.
 # ---------------------------
-@dataclass
 class SyntheticDatasetConfig(BaseModel):
     source: DataSourceEnum
     input_shape: List[int]
@@ -86,7 +81,6 @@ class SyntheticDatasetConfig(BaseModel):
     def input_shape(self, value):
         self._input_shape = value
 
-@dataclass
 class ConcreteDatasetConfig(BaseModel):
     source: DataSourceEnum
     batch_size: int
@@ -116,7 +110,6 @@ WorkloadConfig = Union[OperatorConfig, ModelConfig, FusedOperatorConfig]
 # Define Experiment configuration model
 # ---------------------------
 # TODO: mock or pretrained
-@dataclass
 class ExperimentConfig(BaseModel):
     run_mode: RunModeEnum
     executor: ExecutorConfig
@@ -125,7 +118,6 @@ class ExperimentConfig(BaseModel):
 # ---------------------------
 # Define top-level configuration model integrating workload and experiment configurations
 # ---------------------------
-@dataclass
 class BenchmarkConfig(BaseModel):
     label: str
     workload: WorkloadConfig
