@@ -16,31 +16,21 @@ The **Query-based All-in-one Research Kit (QUARK)** is designed to simplify and 
 
 Before using QUARK, ensure you have the following installed:
 
-1. **Python 3.9**: QUARK requires Python 3.9 or higher.
-2. **Virtual Environment**: Create a virtual environment to isolate dependencies.
+1. **Python 3.9 or higher**: QUARK requires Python 3.9 or higher.
+2. **invoke**: Quark is built atop of invoke and leverage shell to decouple dependencies between modules and repos
+3. **venv**: Quark leverages venv module to manage the sandbox for executing across different environments and configurations, also make shell and docker tests in uniform manner.
 
 ### Installation
 
-To install Quark, run the following command:
+To install Quark, run the following command directly:
 
 ```bash
-make create_env
+poetry install
 ```
-
-you will get create an venv with builtin version of basic tools
-
+Now, the system is installed to your current PYTHON environment, you can just run:
 ```bash
-make build
+quark
 ```
+to check available commands and see the descriptions. The only entry for all experiments/developments are all from this point.
 
-will invoke the corresponding version of poetry config file for your installation. All requirements and setup flow are
-built with poetry for simplicity and uniformity.
-
-You can then test by `make test` or run group of experiments with follow instructions:
-
-```bash
-make bench // run all experiments tasks located and configured at default dir 'experiments'
-make bench --config-dir=<path to config files>  // specify folders for experiments
-make bench --filter-by=<tag> --label=<task name>  // specify by concrete task name or by tag to filter
-```
-you can also directly use the python entry CLI, named `quark`, by `quark --bench`
+For subcommands, you can simply type `--help` after the subcommand, to see the detail option to use it.
