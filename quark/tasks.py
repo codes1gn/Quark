@@ -158,11 +158,11 @@ class Argument:
     ctx: Context = None
 
 @task
-def bench(ctx, label=""):
+def bench(ctx, task=""):
     enable_trace()
     print("Starting benchmark collection and execution...")
     arg = Argument()
-    arg.label = label
+    arg.label = task 
     arg.ctx = ctx
     TRACE(f"arguments = {arg}")
     coordinator = BenchCoordinator(arguments=arg, config_dir=arg.config_dir)

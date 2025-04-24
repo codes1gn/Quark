@@ -1,0 +1,21 @@
+
+label: gemm 
+
+workload:
+  framework: catz 
+  granularity: operator 
+  operator: matmul 
+
+experiment:
+  run_mode: inference
+  executor:
+    framework: catz 
+    device: gpu
+  timer: python
+
+dataset:
+  source: synthetic
+  input_shape: [1024, 1024]
+  batch_size: 1
+  dtype: float32
+
