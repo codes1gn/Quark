@@ -1,5 +1,6 @@
 file(GLOB PLUGINS_SOURCES
-  src/*.cpp
+  src/plugins.cpp
+  src/options.cpp
 )
 
 add_library(plugins STATIC ${PLUGINS_SOURCES})
@@ -17,5 +18,5 @@ target_link_libraries(plugins PRIVATE
 )
 
 # plugin execute
-add_executable(quark-plugins-exec src/cli.cpp)
-target_link_libraries(quark-plugins-exec PRIVATE plugins)
+add_executable(quark-plugins src/cli.cpp)
+target_link_libraries(quark-plugins PRIVATE plugins)

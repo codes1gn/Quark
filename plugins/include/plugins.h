@@ -10,7 +10,7 @@ namespace quark {
 class Plugins {
 public:
     static void smoke_test();
-    static void execute(const std::string &executor, const std::string &opkind, const std::vector<std::string> &arguments);
+    static bool execute(const std::string &executor, const std::string &opkind, const std::vector<std::string> &arguments);
 };
 
 } // namespace quark
