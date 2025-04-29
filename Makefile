@@ -46,7 +46,7 @@ else
     $(error Unsupported GPU compute capability: $(GPU_CC))
 endif
 
-all: build
+all: build-plugins
 
 GPU_NAMES := $(shell nvidia-smi --query-gpu=gpu_name --format=csv,noheader)
 
@@ -54,7 +54,7 @@ query-gpu-arch:
 	@echo "Checking GPU architectures..."
 	@echo "Found GPU-CC = "$(CUDA_COMPUTE_CAPABILITY)
 
-build: query-gpu-arch
+build-plugins: query-gpu-arch
 	@mkdir -p $(BUILD_DIR)
 	@cd $(BUILD_DIR) && $(CMAKE) -DCMAKE_BUILD_TYPE=Release .. \
 		-DCUDA_COMPUTE_CAPABILITY=$(CUDA_COMPUTE_CAPABILITY) \

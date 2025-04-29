@@ -286,6 +286,27 @@ def pull_plugins(ctx):
         else:
             print("Quark project already exists.")
 
+@task
+def build_plugins(ctx):
+    """
+    Build plugins by running 'make build-plugins'.
+    """
+    print("Building plugins...")
+    result = ctx.run("make build-plugins", warn=True)
+
+    if result.failed:
+        print(f"Failed to build plugins: {result.stderr}")
+        raise SystemExit(1)
+    else:
+        print("Plugins built successfully!") 
+
+@task(pre=[build_plugins])
+def catz_smoke_test(ctx):
+    executor_str = "-e catzilla"
+    workload_str = "-w matmul"
+    args_str = "-a 64 64 32 1.0 0x7ffee4b3b000 0x7ffee4b3c000 0.0 0x7ffee4b3d000"
+    ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
+
 # Create a namespace for the tasks
 namespace = Collection(
     bootstrap,
@@ -297,4 +318,6 @@ namespace = Collection(
     unittest,
     get_plugins,
     pull_plugins,
+    build_plugins,
+    catz_smoke_test,
 )
