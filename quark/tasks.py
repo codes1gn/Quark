@@ -253,6 +253,39 @@ def unittest(ctx):
     unittest_tf(ctx)
     unittest_torch(ctx)
 
+
+#################################################################################
+####  Catzilla integration  ####
+#################################################################################
+
+@task
+def get_plugins(ctx):
+    """Load project configuration from config.json."""
+    with open("configuration.json", "r") as f:
+        config = json.load(f)
+    return config["plugins"]
+
+@task
+def pull_plugins(ctx):
+    """
+    Clone the Catzilla repository.
+    """
+    # Define directories
+    quark_dir = "."
+    plugins = get_plugins(ctx)
+
+    # Perform git operations for subprojects
+    for plugin in plugins:
+        plugin_name = plugin["name"]
+        plugin_url = plugin["ssh_url"]
+        plugin_dir = os.path.join(".", plugin_name)
+
+        if not os.path.exists(plugin_name):
+            ctx.run(f"git clone {plugin_url}")
+            print("Quark project cloned.")
+        else:
+            print("Quark project already exists.")
+
 # Create a namespace for the tasks
 namespace = Collection(
     bootstrap,
@@ -262,4 +295,6 @@ namespace = Collection(
     test,
     bench,
     unittest,
+    get_plugins,
+    pull_plugins,
 )

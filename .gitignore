@@ -176,3 +176,6 @@ cython_debug/
 # Quark generated tmp files
 **data/
 **build/
+
+# plugins
+Catzilla/

@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    {
+      "name": "Catzilla",
+      "ssh_url": "git@github.com:codes1gn/Catzilla.git"
+    }
+  ]
+}
