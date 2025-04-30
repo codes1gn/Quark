@@ -1,5 +1,5 @@
-#ifndef SERIALISATION_H
-#define SERIALISATION_H
+#ifndef QUARK_PLUGINS_SERIALISATION_H_
+#define QUARK_PLUGINS_SERIALISATION_H_
 
 #include <msgpack.hpp>
 #include <vector>
@@ -96,4 +96,4 @@ void updatePtrToMsgpack(const std::string& file_path, T* data, size_t size) {
     file.close();
 }
 
-#endif // SERIALISATION_H
+#endif // QUARK_PLUGINS_SERIALISATION_H_

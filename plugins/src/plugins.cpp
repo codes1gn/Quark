@@ -1,16 +1,35 @@
 // plugins/src/plugins.cpp
-#include "plugins.h"
 #include <iostream>
 #include <stdexcept>
 
 #include "recipes/recipes.h"
 #include "serialisation.h"
+#include "arguments.h"
+#include "plugins.h"
 // TODO: strong arguments function
 
 namespace quark {
 
 void Plugins::smoke_test() {
   std::cout << "Smoke test passed! Plugins::smoke_test called successfully." << std::endl;
+}
+
+// matmul 函数的实现
+void matmul_wrapper(const std::vector<OperatorArg>& args) {
+    // 提取参数
+    int M = std::get<int>(args[0]);
+    int N = std::get<int>(args[1]);
+    int K = std::get<int>(args[2]);
+    float alpha = std::get<float>(args[3]);
+    float* A = std::get<float*>(args[4]);
+    float* B = std::get<float*>(args[5]);
+    float beta = std::get<float>(args[6]);
+    float* C = std::get<float*>(args[7]);
+
+    // 调用实际的矩阵乘法逻辑
+    catz::recipes::matmul(M, N, K, alpha, A, B, beta, C);
+
+    std::cout << "Matrix multiplication executed with M=" << M << ", N=" << N << ", K=" << K << std::endl;
 }
 
 bool Plugins::execute(const std::string &executor, const std::string &opkind, const std::vector<std::string> &arguments) { 
@@ -35,44 +54,26 @@ bool Plugins::execute(const std::string &executor, const std::string &opkind, co
   }
   if (executor == "catzilla") {
     if (opkind == "matmul") {
-      for (const auto &str : arguments) {
-        std::cout << str << " ";
-      }
-      std::cout << std::endl;
-      if (arguments.size() < 8) {
-        throw std::invalid_argument("matmul requires 8 arguments: M N K alpha A B beta C");
+      // 定义期望的参数类型
+      std::vector<std::string> expected_types = {"int", "int", "int", "float", "float*", "float*", "float", "float*"};
+
+      // 解析 arguments
+      std::vector<OperatorArg> parsed_args;
+      try {
+          parsed_args = parseArguments(arguments, expected_types);
+      } catch (const std::exception& e) {
+          std::cerr << "Error parsing arguments: " << e.what() << std::endl;
+          return false;
       }
 
-      int M = std::stoi(arguments[0]);
-      int N = std::stoi(arguments[1]);
-      int K = std::stoi(arguments[2]);
-      float alpha = std::stof(arguments[3]);
-      // auto A = deserialize<std::vector<std::vector<float>>>(arguments[4]);
-      // auto B = deserialize<std::vector<std::vector<float>>>(arguments[5]);
-      // auto C = deserialize<std::vector<std::vector<float>>>(arguments[7]);
-      float* A = deserialisePtrFromMsgpack<float>(arguments[4]);
-      float* B = deserialisePtrFromMsgpack<float>(arguments[5]);
-      float* C = deserialisePtrFromMsgpack<float>(arguments[7]);
-      std::cout << "Matrix A:" << std::endl;
-      for (int i = 0; i < 4; ++i) {
-          for (int j = 0; j < 4; ++j) {
-              std::cout << A[i * 64 + j] << " ";
-          }
-          std::cout << std::endl;
-      }
+      // 调用 matmul 函数，传递统一的参数列表
+      matmul_wrapper(parsed_args);
 
-      std::cout << "Matrix B:" << std::endl;
-      for (int i = 0; i < 4; ++i) {
-          for (int j = 0; j < 4; ++j) {
-              std::cout << B[i * 64 + j] << " ";
-          }
-          std::cout << std::endl;
-      }
-      float beta = std::stof(arguments[6]);
+      // 更新结果
+      updatePtrToMsgpack<float>(arguments[7], std::get<float*>(parsed_args[7]), std::get<int>(parsed_args[0]) * std::get<int>(parsed_args[1]));
 
-      catz::recipes::matmul(M, N, K, alpha, A, B, beta, C);
-      updatePtrToMsgpack<float>(arguments[7], C, M*N);
       std::cout << "Matrix multiplication completed by catzilla." << std::endl;
+      return true;
     } else {
       return false;
     }

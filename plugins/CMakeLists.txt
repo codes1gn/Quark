@@ -1,6 +1,7 @@
 file(GLOB PLUGINS_SOURCES
   src/plugins.cpp
   src/options.cpp
+  src/arguments.cpp
 )
 
 add_library(plugins STATIC ${PLUGINS_SOURCES})
