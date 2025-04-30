@@ -6,6 +6,8 @@ import json
 import tempfile
 from functools import wraps
 from invoke import task, Collection, Context
+import numpy as np
+import ctypes
 
 from quark_utility import *
 from dataclasses import dataclass
@@ -303,41 +305,43 @@ def build_plugins(ctx):
 
 @task(pre=[build_plugins])
 def catz_smoke_test(ctx):
-    # executor_str = "-e catzilla"
-    # workload_str = "-w matmul"
-    # args_str = "-a 64 64 32 1.0 0x7ffee4b3b000 0x7ffee4b3c000 0.0 0x7ffee4b3d000"
-    # ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
-    M, N, K = 64, 64, 32
-    alpha = 1.0
-    beta = 0.0
+    tmp_file_A = tempfile.NamedTemporaryFile(suffix=".msgpack", delete=False)
+    tmp_file_B = tempfile.NamedTemporaryFile(suffix=".msgpack", delete=False)
+    tmp_file_C = tempfile.NamedTemporaryFile(suffix=".msgpack", delete=False)
+    tmp_file_path_A = tmp_file_A.name
+    tmp_file_path_B = tmp_file_B.name
+    tmp_file_path_C = tmp_file_C.name
+    TRACE(f"Temporary files created at: {tmp_file_path_A}, {tmp_file_path_B}, {tmp_file_path_C}")
 
-    # A = np.random.rand(M, K).astype(np.float32)
-    # B = np.random.rand(K, N).astype(np.float32)
-    A = np.ones((M, N), dtype=np.float32)
-    B = np.ones((M, N), dtype=np.float32)
-    C = np.zeros((M, N), dtype=np.float32)
+    try:
+        M, N, K = 64, 64, 32
+        alpha = 1.0
+        beta = 0.0
+        A = np.ones((M, K), dtype=np.float32)
+        A = np.ascontiguousarray(A)
+        B = np.ones((K, N), dtype=np.float32)
+        C = np.zeros((M, N), dtype=np.float32)
 
-    A_ptr = A.ctypes.data
-    B_ptr = B.ctypes.data
-    C_ptr = C.ctypes.data
+        serialise_to_msgpack(A.tolist(), tmp_file_path_A)
+        serialise_to_msgpack(B.tolist(), tmp_file_path_B)
+        serialise_to_msgpack(C.tolist(), tmp_file_path_C)
 
-    print(f"A_ptr: {A_ptr}")
-    print(f"B_ptr: {B_ptr}")
-    print(f"C_ptr: {C_ptr}")
+        executor_str = "-e catzilla"
+        workload_str = "-w matmul"
+        args_str = f"-a {M} {N} {K} {alpha} {tmp_file_path_A} {tmp_file_path_B} {beta} {tmp_file_path_C}"
+        ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
 
-    executor_str = "-e catzilla"
-    workload_str = "-w matmul"
-    args_str = f"-a {M} {N} {K} {alpha} {A_ptr} {B_ptr} {beta} {C_ptr}"
+        loaded_C = deserialise_from_msgpack(tmp_file_path_C)
+        print("Loaded C:", loaded_C)
 
-    ctx.run(f"cuda-gdb ./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
-
-    print("Result matrix C:")
-    print(C)
+    finally:
+        os.remove(tmp_file_path_A)
+        os.remove(tmp_file_path_B)
+        os.remove(tmp_file_path_C)
+        print(f"Temporary files {tmp_file_path_A}, {tmp_file_path_B}, {tmp_file_path_C} have been deleted.")
 
 @task(pre=[build_plugins])
 def serialisation_smoke_test(ctx):
-    import numpy as np
-    import ctypes
 
     with tempfile.NamedTemporaryFile(suffix=".msgpack") as tmp_file:
         tmp_file_path = tmp_file.name
@@ -345,9 +349,7 @@ def serialisation_smoke_test(ctx):
 
 
         A = np.ones((2, 2), dtype=np.float32)
-
         A = np.ascontiguousarray(A)
-
         serialise_to_msgpack(A, tmp_file_path)
 
         executor_str = "-e test"

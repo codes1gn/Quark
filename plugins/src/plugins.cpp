@@ -17,8 +17,7 @@ bool Plugins::execute(const std::string &executor, const std::string &opkind, co
   if (executor == "test" && opkind == "test") {
     std::cout << "hello\n";
     std::cout << arguments[0] << std::endl;
-    std::string filename = "quark_data.msgpack";
-    auto data = deserialize<std::vector<std::vector<float>>>(filename);
+    auto data = deserialiseFromMsgpack<std::vector<std::vector<float>>>(arguments[0]);
     std::cout << "Loaded data size: " << data.size() << std::endl;
     for (const auto& row : data) {
         std::cout << "Row size: " << row.size() << std::endl;
@@ -48,30 +47,31 @@ bool Plugins::execute(const std::string &executor, const std::string &opkind, co
       int N = std::stoi(arguments[1]);
       int K = std::stoi(arguments[2]);
       float alpha = std::stof(arguments[3]);
-      float *A = reinterpret_cast<float *>(std::stoull(arguments[4], nullptr, 0));
-      float *B = reinterpret_cast<float *>(std::stoull(arguments[5], nullptr, 0));
-      std::cout << A[0] << std::endl;
-      // std::cout << "Matrix A:" << std::endl;
-      // for (int i = 0; i < 4; ++i) {
-      //     for (int j = 0; j < 4; ++j) {
-      //         std::cout << A[i * 64 + j] << " ";
-      //     }
-      //     std::cout << std::endl;
-      // }
-      // std::cout << std::flush;
-      //
-      // std::cout << "Matrix B:" << std::endl;
-      // for (int i = 0; i < 4; ++i) {
-      //     for (int j = 0; j < 4; ++j) {
-      //         std::cout << B[i * 64 + j] << " ";
-      //     }
-      //     std::cout << std::endl;
-      // }
-      // std::cout << std::flush;
+      // auto A = deserialize<std::vector<std::vector<float>>>(arguments[4]);
+      // auto B = deserialize<std::vector<std::vector<float>>>(arguments[5]);
+      // auto C = deserialize<std::vector<std::vector<float>>>(arguments[7]);
+      float* A = deserialisePtrFromMsgpack<float>(arguments[4]);
+      float* B = deserialisePtrFromMsgpack<float>(arguments[5]);
+      float* C = deserialisePtrFromMsgpack<float>(arguments[7]);
+      std::cout << "Matrix A:" << std::endl;
+      for (int i = 0; i < 4; ++i) {
+          for (int j = 0; j < 4; ++j) {
+              std::cout << A[i * 64 + j] << " ";
+          }
+          std::cout << std::endl;
+      }
+
+      std::cout << "Matrix B:" << std::endl;
+      for (int i = 0; i < 4; ++i) {
+          for (int j = 0; j < 4; ++j) {
+              std::cout << B[i * 64 + j] << " ";
+          }
+          std::cout << std::endl;
+      }
       float beta = std::stof(arguments[6]);
-      float *C = reinterpret_cast<float *>(std::stoull(arguments[7], nullptr, 0));
 
       catz::recipes::matmul(M, N, K, alpha, A, B, beta, C);
+      updatePtrToMsgpack<float>(arguments[7], C, M*N);
       std::cout << "Matrix multiplication completed by catzilla." << std::endl;
     } else {
       return false;
