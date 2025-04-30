@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import sys
 import json
+import tempfile
 from functools import wraps
 from invoke import task, Collection, Context
 
@@ -302,10 +303,59 @@ def build_plugins(ctx):
 
 @task(pre=[build_plugins])
 def catz_smoke_test(ctx):
+    # executor_str = "-e catzilla"
+    # workload_str = "-w matmul"
+    # args_str = "-a 64 64 32 1.0 0x7ffee4b3b000 0x7ffee4b3c000 0.0 0x7ffee4b3d000"
+    # ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
+    M, N, K = 64, 64, 32
+    alpha = 1.0
+    beta = 0.0
+
+    # A = np.random.rand(M, K).astype(np.float32)
+    # B = np.random.rand(K, N).astype(np.float32)
+    A = np.ones((M, N), dtype=np.float32)
+    B = np.ones((M, N), dtype=np.float32)
+    C = np.zeros((M, N), dtype=np.float32)
+
+    A_ptr = A.ctypes.data
+    B_ptr = B.ctypes.data
+    C_ptr = C.ctypes.data
+
+    print(f"A_ptr: {A_ptr}")
+    print(f"B_ptr: {B_ptr}")
+    print(f"C_ptr: {C_ptr}")
+
     executor_str = "-e catzilla"
     workload_str = "-w matmul"
-    args_str = "-a 64 64 32 1.0 0x7ffee4b3b000 0x7ffee4b3c000 0.0 0x7ffee4b3d000"
-    ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
+    args_str = f"-a {M} {N} {K} {alpha} {A_ptr} {B_ptr} {beta} {C_ptr}"
+
+    ctx.run(f"cuda-gdb ./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
+
+    print("Result matrix C:")
+    print(C)
+
+@task(pre=[build_plugins])
+def serialisation_smoke_test(ctx):
+    import numpy as np
+    import ctypes
+
+    with tempfile.NamedTemporaryFile(suffix=".msgpack") as tmp_file:
+        tmp_file_path = tmp_file.name
+        print(f"Temporary file created at: {tmp_file_path}")
+
+
+        A = np.ones((2, 2), dtype=np.float32)
+
+        A = np.ascontiguousarray(A)
+
+        serialise_to_msgpack(A, tmp_file_path)
+
+        executor_str = "-e test"
+        workload_str = "-w test"
+        args_str = f"-a {tmp_file_path}"
+
+        ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
+
 
 # Create a namespace for the tasks
 namespace = Collection(
@@ -320,4 +370,5 @@ namespace = Collection(
     pull_plugins,
     build_plugins,
     catz_smoke_test,
+    serialisation_smoke_test,
 )

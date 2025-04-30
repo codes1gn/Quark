@@ -67,6 +67,18 @@ build-plugins: query-gpu-arch
 		-GNinja
 	@ninja -C $(BUILD_DIR)
 
+debug-plugins: query-gpu-arch
+	@mkdir -p $(BUILD_DIR)
+	@cd $(BUILD_DIR) && $(CMAKE) -DCMAKE_BUILD_TYPE=RelWithDebInfo .. \
+		-DCUDA_COMPUTE_CAPABILITY=$(CUDA_COMPUTE_CAPABILITY) \
+		-DCMAKE_C_COMPILER_LAUNCHER=ccache \
+		-DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+		-DCMAKE_C_COMPILER=clang \
+		-DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_CUDA_COMPILER=nvcc \
+        -DCMAKE_CUDA_FLAGS="-g -G -O2 --ptxas-options=-v --expt-relaxed-constexpr" \
+        -GNinja
+	@ninja -C $(BUILD_DIR)
 
 clean:
 	@rm -rf $(BUILD_DIR)
