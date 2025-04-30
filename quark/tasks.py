@@ -1,22 +1,24 @@
-from platform import python_version
-from pathlib import Path
+import ctypes
+import json
 import os
 import sys
-import json
 import tempfile
-from functools import wraps
-from invoke import task, Collection, Context
-import numpy as np
-import ctypes
-
-from quark_utility import *
 from dataclasses import dataclass
-from quark import BenchCoordinator
+from functools import wraps
+from pathlib import Path
+from platform import python_version
 
+import numpy as np
+from invoke import Collection, Context, task
+from quark_utility import *
+
+from quark import BenchCoordinator
 
 # Get the current Python version
 CURRENT_PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
-print(f"python_version: {CURRENT_PYTHON_VERSION} (type: {type(CURRENT_PYTHON_VERSION)})")
+print(
+    f"python_version: {CURRENT_PYTHON_VERSION} (type: {type(CURRENT_PYTHON_VERSION)})"
+)
 
 # Get root project dir
 root_dir = Path(__file__).resolve().parent.parent
@@ -25,13 +27,14 @@ root_dir = Path(__file__).resolve().parent.parent
 ####  Helper Functions  ####
 #################################################################################
 
+
 @task
 @check_framework
 def link_config_file(ctx, framework=None):
     """
     Create a symbolic link to the pyproject.toml file using an absolute path.
     """
-    pyver_str = CURRENT_PYTHON_VERSION.replace('.', '')
+    pyver_str = CURRENT_PYTHON_VERSION.replace(".", "")
     relative_path = f"./environments/configs/py{pyver_str}/{framework}/pyproject.toml"
 
     # Convert the relative path to an absolute path
@@ -53,9 +56,11 @@ def link_config_file(ctx, framework=None):
 
     print("Symbolic link created successfully.")
 
+
 #################################################################################
 ####  Tasks  ####
 #################################################################################
+
 
 @task
 @check_framework
@@ -67,6 +72,7 @@ def create_env(ctx, framework=None):
     ctx.run(f"python{CURRENT_PYTHON_VERSION} -m venv {venv_name}")
     print(f"Virtualenv '{venv_name}' created.")
 
+
 @task
 @check_framework
 @with_venv
@@ -77,6 +83,7 @@ def config_poetry(ctx, framework=None):
     ctx.run(f"python{CURRENT_PYTHON_VERSION} -m pip install poetry")
     ctx.run("poetry config virtualenvs.create false")
     print("Poetry installed and configured.")
+
 
 @task
 @check_framework
@@ -92,6 +99,7 @@ def install_impl(ctx, framework=None):
         ctx.run("poetry lock")
         ctx.run("poetry install")
         print("Project dependencies installed.")
+
 
 @task
 @check_framework
@@ -113,8 +121,9 @@ def bootstrap_impl(ctx, framework=None):
     """
     Run all bootstrap tasks: create virtualenv, configure Poetry, and install dependencies.
     """
-    create_env(ctx, framework) 
-    config_poetry(ctx, framework) 
+    create_env(ctx, framework)
+    config_poetry(ctx, framework)
+
 
 @task
 @check_framework
@@ -131,6 +140,23 @@ def build_impl(ctx, framework=None):
             ctx.run("poetry lock")
             ctx.run("poetry build")
             print(f"Project built for {framework}.")
+
+
+@task
+def format(ctx):
+    """
+    Format the code using black, isort, and clang-format.
+    """
+    with ctx.cd("."):
+        print("Formatting Python code...")
+        ctx.run("black .")
+        ctx.run("isort .")
+
+        print("Formatting C++ code...")
+        # 使用 clang-format 格式化 .cpp 和 .h 文件
+        # hardcode plugins only, skip third-party srcs
+        ctx.run("find plugins -name '*.cpp' -o -name '*.h' | xargs clang-format -i")
+
 
 @task
 def clean(ctx):
@@ -150,9 +176,11 @@ def clean(ctx):
     ctx.run(f"rm -rf {venv_dir}")
     print("Done.")
 
+
 #################################################################################
 ####  Impl for benchmark  ####
 #################################################################################
+
 
 @dataclass
 class Argument:
@@ -160,16 +188,18 @@ class Argument:
     config_dir: str = "experiments"
     ctx: Context = None
 
+
 @task
 def bench(ctx, task=""):
     enable_trace()
     print("Starting benchmark collection and execution...")
     arg = Argument()
-    arg.label = task 
+    arg.label = task
     arg.ctx = ctx
     TRACE(f"arguments = {arg}")
     coordinator = BenchCoordinator(arguments=arg, config_dir=arg.config_dir)
     coordinator.bench()
+
 
 @task
 @with_torch_venv
@@ -179,9 +209,11 @@ def quark_engine_test(ctx):
     # TODO: need arguments handler
     ctx.run("quark-runtime")
 
+
 #################################################################################
 ####  Framework-Specific Tasks  ####
 #################################################################################
+
 
 # TODO: support --platform=torch/tensorflow/catz and make all by default
 # TODO: let filter by platforms supported only
@@ -191,15 +223,18 @@ def bootstrap(ctx):
     bootstrap_impl(ctx, framework="torch")
     bootstrap_impl(ctx, framework="tensorflow")
 
+
 @task
 def install(ctx):
     install_impl(ctx, framework="torch")
     install_impl(ctx, framework="tensorflow")
 
+
 @task
 def build(ctx):
     build_impl(ctx, framework="torch")
     build_impl(ctx, framework="tensorflow")
+
 
 @task
 def test(ctx):
@@ -212,13 +247,17 @@ def test(ctx):
     smoke_test(ctx)
     unittest(ctx)
     quark_engine_test(ctx)
-#TODO: template to create tasks, with comments for prompting
+
+
+# TODO: template to create tasks, with comments for prompting
+
 
 @task
 @with_torch_venv
 def smoke_test(ctx):
     smoke_test = root_dir / "tests/smoke_tests/check_quarkrt.py"
     ctx.run(f"python {smoke_test}")
+
 
 @task
 @with_torch_venv
@@ -234,6 +273,7 @@ def unittest_torch(ctx):
     for test_file in test_files:
         ctx.run(f"pytest {test_file}")
 
+
 @task
 @with_tf_venv
 def unittest_tf(ctx):
@@ -248,6 +288,7 @@ def unittest_tf(ctx):
     for test_file in test_files:
         ctx.run(f"pytest {test_file}")
 
+
 @task
 def unittest(ctx):
     """
@@ -261,12 +302,14 @@ def unittest(ctx):
 ####  Catzilla integration  ####
 #################################################################################
 
+
 @task
 def get_plugins(ctx):
     """Load project configuration from config.json."""
     with open("configuration.json", "r") as f:
         config = json.load(f)
     return config["plugins"]
+
 
 @task
 def pull_plugins(ctx):
@@ -289,6 +332,7 @@ def pull_plugins(ctx):
         else:
             print("Quark project already exists.")
 
+
 @task
 def build_plugins(ctx):
     """
@@ -301,7 +345,8 @@ def build_plugins(ctx):
         print(f"Failed to build plugins: {result.stderr}")
         raise SystemExit(1)
     else:
-        print("Plugins built successfully!") 
+        print("Plugins built successfully!")
+
 
 @task(pre=[build_plugins])
 def catz_smoke_test(ctx):
@@ -311,7 +356,9 @@ def catz_smoke_test(ctx):
     tmp_file_path_A = tmp_file_A.name
     tmp_file_path_B = tmp_file_B.name
     tmp_file_path_C = tmp_file_C.name
-    TRACE(f"Temporary files created at: {tmp_file_path_A}, {tmp_file_path_B}, {tmp_file_path_C}")
+    TRACE(
+        f"Temporary files created at: {tmp_file_path_A}, {tmp_file_path_B}, {tmp_file_path_C}"
+    )
 
     try:
         M, N, K = 64, 64, 32
@@ -329,7 +376,9 @@ def catz_smoke_test(ctx):
         executor_str = "-e catzilla"
         workload_str = "-w matmul"
         args_str = f"-a {M} {N} {K} {alpha} {tmp_file_path_A} {tmp_file_path_B} {beta} {tmp_file_path_C}"
-        ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
+        ctx.run(
+            f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}"
+        )
 
         loaded_C = deserialise_from_msgpack(tmp_file_path_C)
         print("Loaded C:", loaded_C)
@@ -338,15 +387,16 @@ def catz_smoke_test(ctx):
         os.remove(tmp_file_path_A)
         os.remove(tmp_file_path_B)
         os.remove(tmp_file_path_C)
-        print(f"Temporary files {tmp_file_path_A}, {tmp_file_path_B}, {tmp_file_path_C} have been deleted.")
+        print(
+            f"Temporary files {tmp_file_path_A}, {tmp_file_path_B}, {tmp_file_path_C} have been deleted."
+        )
+
 
 @task(pre=[build_plugins])
 def serialisation_smoke_test(ctx):
-
     with tempfile.NamedTemporaryFile(suffix=".msgpack") as tmp_file:
         tmp_file_path = tmp_file.name
         print(f"Temporary file created at: {tmp_file_path}")
-
 
         A = np.ones((2, 2), dtype=np.float32)
         A = np.ascontiguousarray(A)
@@ -356,7 +406,9 @@ def serialisation_smoke_test(ctx):
         workload_str = "-w test"
         args_str = f"-a {tmp_file_path}"
 
-        ctx.run(f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}")
+        ctx.run(
+            f"./build/plugins/quark-plugins {executor_str} {workload_str} {args_str}"
+        )
 
 
 # Create a namespace for the tasks
@@ -364,6 +416,7 @@ namespace = Collection(
     bootstrap,
     install,
     build,
+    format,
     clean,
     test,
     bench,

@@ -4,11 +4,13 @@ from .trace import *
 TORCH_SUPPORTED = False
 TF_SUPPORTED = False
 
+
 def enable_torch_support():
     """Enable Torch support"""
     TRACE("Switch ON TORCH platform.")
     global TORCH_SUPPORTED
     TORCH_SUPPORTED = True
+
 
 def disable_torch_support():
     """Disable Torch support"""
@@ -16,11 +18,13 @@ def disable_torch_support():
     global TORCH_SUPPORTED
     TORCH_SUPPORTED = False
 
+
 def enable_tf_support():
     """Enable TensorFlow support"""
     TRACE("Switch ON TENSORFLOW platform.")
     global TF_SUPPORTED
     TF_SUPPORTED = True
+
 
 def disable_tf_support():
     """Disable TensorFlow support"""

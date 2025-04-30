@@ -43,4 +43,3 @@ class TFExecutor(ExecutorBase):
             with tf.GradientTape() as tape:
                 output = self.workload.model(input_data, training=True)
         return output
-

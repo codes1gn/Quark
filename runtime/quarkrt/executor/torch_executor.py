@@ -12,12 +12,14 @@ from .executor_base import ExecutorBase
 
 @dataclass
 class TorchExecutor(ExecutorBase):
-    available_devices: dict[DeviceEnum, torch.device] = field(init=False, default_factory=dict)
+    available_devices: dict[DeviceEnum, torch.device] = field(
+        init=False, default_factory=dict
+    )
 
     def __post_init__(self):
         super().__post_init__()
         self.load_available_devices()
-        assert(self._validate())
+        assert self._validate()
 
     def load_available_devices(self):
         """Retrieve all available devices including CPU, CUDA, MPS, and XPU."""
@@ -42,7 +44,9 @@ class TorchExecutor(ExecutorBase):
 
         device = self.get_device()
         if device is None:
-            raise RuntimeError(f"Requested device {self.config.experiment.executor.device} is not available.")
+            raise RuntimeError(
+                f"Requested device {self.config.experiment.executor.device} is not available."
+            )
 
         # TRACE(f"Executing model = {workload.workload}")
 
@@ -66,8 +70,10 @@ class TorchExecutor(ExecutorBase):
             model.train()
 
             # Default to CrossEntropyLoss if not specified
-            loss_fn = getattr(workload, "loss_fn", torch.nn.CrossEntropyLoss())  
-            optimizer = getattr(workload, "optimizer", torch.optim.SGD)(model.parameters(), lr=0.01)  
+            loss_fn = getattr(workload, "loss_fn", torch.nn.CrossEntropyLoss())
+            optimizer = getattr(workload, "optimizer", torch.optim.SGD)(
+                model.parameters(), lr=0.01
+            )
 
             output = model(input_data)
             loss = loss_fn(output, label_data)
@@ -80,4 +86,3 @@ class TorchExecutor(ExecutorBase):
 
         else:
             unreachable()
-

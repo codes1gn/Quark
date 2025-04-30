@@ -1,14 +1,13 @@
-
 import json
 import os
-from dataclasses import dataclass, field, asdict
-import yaml
+from dataclasses import asdict, dataclass, field
 
+import yaml
 from quark_utility import *
 from quarkrt.data_utils import DataProviderBase, DataProviderBuilder
 from quarkrt.executor import ExecutorBase, ExecutorBuilder
-from quarkrt.workload import WorkloadBase, WorkloadBuilder
 from quarkrt.timer import *
+from quarkrt.workload import WorkloadBase, WorkloadBuilder
 
 
 # TODO: clear out unused fields, like timer_type
@@ -28,16 +27,16 @@ class Runner:
         self.timer = TimerBuilder.build(self.config.experiment.timer)
         self.executor = ExecutorBuilder.build(self.config)
         self.workload = WorkloadBuilder.build(self.config)
-        self.data_provider = DataProviderBuilder.build(self.config) 
+        self.data_provider = DataProviderBuilder.build(self.config)
         self.results = {}
-        assert(self._validate())
+        assert self._validate()
 
     def _validate(self) -> bool:
         # Check if any field is None or empty
         for field_name, value in self.__dict__.items():
             if value is None or (isinstance(value, str) and not value.strip()):
                 print(f"Field '{field_name}' is empty or not set.")
-                assert(0)
+                assert 0
         if not self.data_provider._validate():
             return False
         if not self.executor._validate():
@@ -56,7 +55,7 @@ class Runner:
         # self.executor.set_workload(self.workload)
         # self.executor.set_data_provider(self.data_provider)
         TRACE("Start Benchmarking on task {}".format(self.config.label))
-        
+
         # Initialize timer and run the workload
 
         self.timer.run(self.executor.execute, self.workload, self.data_provider)
@@ -116,7 +115,9 @@ class Runner:
 
         # Save to JSON file
         with open(result_file, "w") as file:
-            json.dump(self.results, file, default=serializer, indent=4, ensure_ascii=False)
+            json.dump(
+                self.results, file, default=serializer, indent=4, ensure_ascii=False
+            )
 
         TRACE(f"Benchmark results saved to {result_file}")
 

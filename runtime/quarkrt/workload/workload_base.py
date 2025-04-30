@@ -9,19 +9,23 @@ from quark_utility import *
 from quarkrt.data_utils import *
 
 __all__ = [
-    'WorkloadBase',
+    "WorkloadBase",
 ]
+
 
 @dataclass
 class WorkloadBase(ABC):
     """Abstract base class for defining different workload types across platforms."""
+
     config: BenchmarkConfig = field(default=None)
     granularity: GranularityEnum = GranularityEnum.MODEL
     mode: RunModeEnum = RunModeEnum.INFERENCE
     workload: Optional[Any] = None
 
     def __post_init__(self):
-        TRACE("Create {} for task {}".format(self.__class__.__name__, self.config.label))
+        TRACE(
+            "Create {} for task {}".format(self.__class__.__name__, self.config.label)
+        )
         self.granularity = self.config.workload.granularity
         self.mode = self.config.experiment.run_mode
         if self.granularity == GranularityEnum.OPERATOR:
@@ -34,7 +38,7 @@ class WorkloadBase(ABC):
         else:
             unreachable(f"Unsupported workload type: {self.config.granularity}")
 
-        assert(self._validate())
+        assert self._validate()
 
     def _validate(self) -> bool:
         # Check if any field is None or empty
@@ -55,4 +59,3 @@ class WorkloadBase(ABC):
     def load_operator(self, operator_type: OperatorEnum):
         """Load a specific operator based on the OperatorEnum enum."""
         pass
-

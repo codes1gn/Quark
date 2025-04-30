@@ -1,7 +1,8 @@
 #include "options.h"
 #include <iostream>
 
-void Options::addOption(const std::string &name, const std::string &description) {
+void Options::addOption(const std::string &name,
+                        const std::string &description) {
   options[name] = {name, description};
 }
 
@@ -51,4 +52,3 @@ void Options::printHelp() const {
     std::cout << "  -" << name << " " << option.description << std::endl;
   }
 }
-

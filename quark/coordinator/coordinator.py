@@ -4,9 +4,8 @@ import time
 from typing import List
 
 import yaml
+from invoke import Context, task
 from quark_utility import *
-
-from invoke import task, Context
 
 
 class BenchCoordinator:
@@ -25,7 +24,9 @@ class BenchCoordinator:
         # for file in config_files:
         #     config_data = ConfigBuilder.load_config(file)
         #     self.task_configs.append(config_data)
-        self.config_files = glob.glob(os.path.join(self.config_dir, "**", "*.yml"), recursive=True)
+        self.config_files = glob.glob(
+            os.path.join(self.config_dir, "**", "*.yml"), recursive=True
+        )
         TRACE(self.config_files)
 
     def filter_config_files(self):
@@ -34,12 +35,16 @@ class BenchCoordinator:
             self.matching_files = self.config_files
             return
 
-        self.matching_files = [config for config in self.config_files if ConfigBuilder.load_config(config).label == self.arguments.label]
+        self.matching_files = [
+            config
+            for config in self.config_files
+            if ConfigBuilder.load_config(config).label == self.arguments.label
+        ]
 
     def decode(self, file: str):
         TRACE(f"Load config file: {file}")
         return ConfigBuilder.load_config(file)
-    
+
     def run_benchmark(self, task_file, idx, total_tasks):
         config = self.decode(task_file)
         label = config.label
@@ -57,6 +62,7 @@ class BenchCoordinator:
     def bench(self):
         self.run_benchmarks()
 
+
 @task
 @with_venv
 def run(ctx: Context, task_file: str, num_iterations: int = 10):
@@ -70,4 +76,3 @@ def run(ctx: Context, task_file: str, num_iterations: int = 10):
     cmd = f"quark-runtime --bench --task={task_file} --trace"
     TRACE("Running cmd = {}".format(cmd))
     ctx.run(cmd)
-

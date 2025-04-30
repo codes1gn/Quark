@@ -6,25 +6,30 @@ import traceback
 TRACE_ENABLED = False
 DEBUG_ENABLED = False
 
+
 def enable_trace():
     """Enable trace mode"""
     global TRACE_ENABLED
     TRACE_ENABLED = True
+
 
 def disable_trace():
     """Disable trace mode"""
     global TRACE_ENABLED
     TRACE_ENABLED = False
 
+
 def enable_debug():
     """Enable trace mode"""
     global DEBUG_ENABLED
     DEBUG_ENABLED = True
 
+
 def disable_debug():
     """Disable trace mode"""
     global DEBUG_ENABLED
     DEBUG_ENABLED = False
+
 
 def TRACE(message: str):
     """Output TRACE information to stdout"""
@@ -36,6 +41,7 @@ def TRACE(message: str):
 
         # Print the information in a readable format with filename, line number, and function name
         print(f"[TRACE] {filename}:{line_no} - {func_name}: {message}")
+
 
 def DEBUG(message: str):
     """Output TRACE information to stdout"""
@@ -67,4 +73,3 @@ def DEV():
         print(f"  {frame.filename}({frame.lineno}): {frame.function}")
     print("Aborting the program...")
     sys.exit(1)
-

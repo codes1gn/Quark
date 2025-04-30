@@ -2,8 +2,8 @@
 #define QUARK_PLUGINS_OPTIONS_H_
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 class Options {
 public:
@@ -34,4 +34,3 @@ private:
 };
 
 #endif // QUARK_PLUGINS_OPTIONS_H_
-

@@ -6,5 +6,5 @@ if TORCH_SUPPORTED:
 
 if TF_SUPPORTED:
     from .tf_data_provider import *
-    
+
 from .iree_data_provider import *

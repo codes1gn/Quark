@@ -1,15 +1,19 @@
-from platform import python_version
+import json
 import os
 import sys
-import json
 from functools import wraps
-from invoke import task, Collection
+from platform import python_version
+
+from invoke import Collection, task
 
 from .validator import check_framework
 
 # Get the current Python version
 CURRENT_PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
-print(f"python_version: {CURRENT_PYTHON_VERSION} (type: {type(CURRENT_PYTHON_VERSION)})")
+print(
+    f"python_version: {CURRENT_PYTHON_VERSION} (type: {type(CURRENT_PYTHON_VERSION)})"
+)
+
 
 @task
 def get_venv_name(ctx, framework=None):
@@ -17,13 +21,17 @@ def get_venv_name(ctx, framework=None):
     Generate the virtual environment name based on the Python version and framework.
     """
     framework_suffix = f"_{framework}" if framework else ""
-    return f"~/.venv/sandbox_py{CURRENT_PYTHON_VERSION.replace('.', '')}{framework_suffix}"
+    return (
+        f"~/.venv/sandbox_py{CURRENT_PYTHON_VERSION.replace('.', '')}{framework_suffix}"
+    )
+
 
 def is_venv_active():
     """
     Check if a virtual environment is active.
     """
     return os.environ.get("VIRTUAL_ENV") is not None
+
 
 @check_framework
 def get_activate_cmd(ctx, framework=None):
@@ -36,10 +44,12 @@ def get_activate_cmd(ctx, framework=None):
     print(f"Activating virtualenv: source {activate_path}")
     return f"source {activate_path}"
 
+
 def with_venv(func):
     """
     Decorator to ensure the task runs in a virtual environment.
     """
+
     @wraps(func)
     def wrapper(ctx, *args, **kwargs):
         try:
@@ -59,12 +69,15 @@ def with_venv(func):
         finally:
             os.environ.pop("TF_SUPPORTED", None)
             os.environ.pop("TORCH_SUPPORTED", None)
+
     return wrapper
+
 
 def with_tf_venv(func):
     """
     Decorator to ensure the task runs in a virtual environment.
     """
+
     @wraps(func)
     def wrapper(ctx, *args, **kwargs):
         if not is_venv_active():
@@ -72,12 +85,15 @@ def with_tf_venv(func):
             with ctx.prefix(activate_cmd):
                 return func(ctx, *args, **kwargs)
         return func(ctx, *args, **kwargs)
+
     return wrapper
+
 
 def with_torch_venv(func):
     """
     Decorator to ensure the task runs in a virtual environment.
     """
+
     @wraps(func)
     def wrapper(ctx, *args, **kwargs):
         if not is_venv_active():
@@ -85,5 +101,5 @@ def with_torch_venv(func):
             with ctx.prefix(activate_cmd):
                 return func(ctx, *args, **kwargs)
         return func(ctx, *args, **kwargs)
-    return wrapper
 
+    return wrapper

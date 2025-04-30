@@ -1,4 +1,3 @@
-
 from quark_utility.enum import *
 from quarkrt.workload.workload_base import *
 
@@ -15,5 +14,3 @@ class IREEWorkload(WorkloadBase):
         """Load an IREE-compatible model (ONNX or TOSA)."""
         # Placeholder for actual IREE loading logic
         pass
-
-

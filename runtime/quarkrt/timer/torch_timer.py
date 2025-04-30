@@ -1,5 +1,7 @@
 import torch
+
 from .timer_base import TimerBase
+
 
 class PyTorchTimer(TimerBase):
     """Timer using PyTorch's cuda event-based timing, suitable for GPU operations."""
@@ -15,10 +17,11 @@ class PyTorchTimer(TimerBase):
     def stop(self):
         self.end_event.record()
         torch.cuda.synchronize()  # Ensures events are complete
-        elapsed = self.start_event.elapsed_time(self.end_event) / 1000  # Convert to seconds
+        elapsed = (
+            self.start_event.elapsed_time(self.end_event) / 1000
+        )  # Convert to seconds
         self.times.append(elapsed)
 
     def observe(self) -> float:
         """In PyTorchTimer, observe is not used directly, as start/stop are overridden."""
         return 0.0  # Placeholder, not used in this class
-

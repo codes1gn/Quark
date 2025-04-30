@@ -2,9 +2,9 @@ from enum import Enum
 
 import numpy as np
 import tensorflow as tf
+from quark_utility import *
 from tensorflow.data import Dataset as tfDataset
 
-from quark_utility import *
 from .data_provider_base import *
 
 
@@ -38,18 +38,29 @@ class TensorFlowDataProvider(DataProviderBase):
             self.dataset = dataset.batch(self.batch_size).shuffle(10000)
         elif self.data_source == DataSourceEnum.MNIST:
             (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
-            dataset = (tfDataset.from_tensor_slices((x_train, y_train))
-                       .shuffle(10000)
-                       .batch(self.batch_size)
-                       .map(lambda x, y: (tf.image.resize(tf.expand_dims(x, -1), self.input_shape[:2]), y)))
+            dataset = (
+                tfDataset.from_tensor_slices((x_train, y_train))
+                .shuffle(10000)
+                .batch(self.batch_size)
+                .map(
+                    lambda x, y: (
+                        tf.image.resize(tf.expand_dims(x, -1), self.input_shape[:2]),
+                        y,
+                    )
+                )
+            )
         elif self.data_source == DataSourceEnum.CIFAR10:
             (x_train, y_train), _ = tf.keras.datasets.cifar10.load_data()
-            dataset = (tfDataset.from_tensor_slices((x_train, y_train))
-                       .shuffle(10000)
-                       .batch(self.batch_size)
-                       .map(lambda x, y: (tf.image.resize(x, self.input_shape[:2]), y)))
+            dataset = (
+                tfDataset.from_tensor_slices((x_train, y_train))
+                .shuffle(10000)
+                .batch(self.batch_size)
+                .map(lambda x, y: (tf.image.resize(x, self.input_shape[:2]), y))
+            )
         else:
-            raise ValueError(f"Dataset {name} not supported for TensorFlowDataProvider.")
+            raise ValueError(
+                f"Dataset {name} not supported for TensorFlowDataProvider."
+            )
         self.dataset = iter(dataset)
         self._iterator = iter(dataset)
 

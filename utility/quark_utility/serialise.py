@@ -1,7 +1,9 @@
-import numpy as np
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 from enum import Enum, EnumMeta
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+
 import msgpack
+import numpy as np
+
 
 def enum_serializer(obj: Any) -> Any:
     """Custom JSON serializer for FrameworkEnum and other non-serializable objects."""
@@ -9,12 +11,14 @@ def enum_serializer(obj: Any) -> Any:
         return obj.value
     raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
+
 def numpy_serializer(obj):
     if isinstance(obj, np.ndarray):
         return obj.tolist()
     elif isinstance(obj, np.generic):
         return obj.item()
     raise TypeError(f"Type {type(obj)} not serializable")
+
 
 # TODO: impl other serialisation backend if needed
 def serialise_to_msgpack(data, filename):
@@ -28,10 +32,11 @@ def serialise_to_msgpack(data, filename):
     # Convert NumPy arrays to Python lists for compatibility
     if isinstance(data, np.ndarray):
         data = data.tolist()
-    
+
     # Serialize data using MessagePack
     with open(filename, "wb") as f:
         msgpack.pack(data, f)
+
 
 def deserialise_from_msgpack(filename):
     """
@@ -47,4 +52,3 @@ def deserialise_from_msgpack(filename):
     with open(filename, "rb") as f:
         data = msgpack.unpack(f)
     return data
-

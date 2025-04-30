@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-import tensorflow as tf
 
+import tensorflow as tf
 from quark_utility.enum import *
 from quarkrt.workload.workload_base import *
 
@@ -11,16 +11,18 @@ class TFWorkload(WorkloadBase):
     def load_model(self, model_type: ModelEnum):
         """Load a TensorFlow model based on the ModelEnum enum."""
         if model_type == ModelEnum.RESNET50:
-            self.workload = tf.keras.applications.ResNet50(weights='imagenet')
+            self.workload = tf.keras.applications.ResNet50(weights="imagenet")
         elif model_type == ModelEnum.MOBILENET:
-            self.workload = tf.keras.applications.MobileNetV2(weights='imagenet')
+            self.workload = tf.keras.applications.MobileNetV2(weights="imagenet")
         else:
             raise ValueError(f"Unsupported model: {model_type}")
 
     def load_operator(self, operator_type: OperatorEnum):
         """Load a TensorFlow operator based on the OperatorEnum enum."""
         if operator_type == OperatorEnum.CONV2D:
-            self.workload = tf.keras.layers.Conv2D(64, 3, padding="same", activation="relu")
+            self.workload = tf.keras.layers.Conv2D(
+                64, 3, padding="same", activation="relu"
+            )
         elif operator_type == OperatorEnum.FC:
             self.workload = tf.keras.layers.Dense(1000, activation="softmax")
         elif operator_type == OperatorEnum.RELU:
@@ -31,4 +33,3 @@ class TFWorkload(WorkloadBase):
             self.workload = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))
         else:
             raise ValueError(f"Unsupported operator: {operator_type}")
-

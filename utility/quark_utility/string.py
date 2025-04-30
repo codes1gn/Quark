@@ -1,7 +1,6 @@
 from pathlib import Path
 
-__all__ = ["stringify", "destringify",
-           "stringify_tensor", "change_mlir_suffix"]
+__all__ = ["stringify", "destringify", "stringify_tensor", "change_mlir_suffix"]
 
 
 def stringify():
@@ -39,8 +38,8 @@ def stringify_tensor(shape_tuple, dtype="f32"):
 # This util function deals with path changing, from any .mlir or .mlir.<ext-name> to "suffix"
 def change_mlir_suffix(filename):
     path = Path(filename)
-    if path.suffix == '.mlir' or path.suffixes[-2:] == ['.mlir', '']:
-        return str(path.with_suffix('.vmfb'))
-    elif path.suffixes and path.suffixes[-2].endswith('.mlir'):
-        return str(path.with_name(path.stem.rsplit('.mlir', 1)[0] + '.vmfb'))
+    if path.suffix == ".mlir" or path.suffixes[-2:] == [".mlir", ""]:
+        return str(path.with_suffix(".vmfb"))
+    elif path.suffixes and path.suffixes[-2].endswith(".mlir"):
+        return str(path.with_name(path.stem.rsplit(".mlir", 1)[0] + ".vmfb"))
     return filename

@@ -1,4 +1,5 @@
 from invoke import Program
+
 from .tasks import namespace
 
 program = Program(namespace=namespace, name="quark")

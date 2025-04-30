@@ -3,9 +3,10 @@ import itertools
 import json
 import re
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pprint import pformat
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+
 import numpy as np
 import yaml
 from pydantic import (BaseModel, ValidationError, field_validator,
@@ -20,33 +21,36 @@ class OperatorConfig(BaseModel):
     granularity: GranularityEnum  # Must be "operator"
     operator: OperatorEnum
 
-    @field_validator('granularity')
+    @field_validator("granularity")
     def must_be_synthetic(cls, v):
         if v != GranularityEnum.OPERATOR:
-            raise ValueError('source must be SYNTHETIC')
+            raise ValueError("source must be SYNTHETIC")
         return v
+
 
 class ModelConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum
     model: ModelEnum
 
-    @field_validator('granularity')
+    @field_validator("granularity")
     def must_be_synthetic(cls, v):
         if v != GranularityEnum.MODEL:
-            raise ValueError('source must be SYNTHETIC')
+            raise ValueError("source must be SYNTHETIC")
         return v
+
 
 class FusedOperatorConfig(BaseModel):
     framework: FrameworkEnum
     granularity: GranularityEnum
     operators: List[OperatorEnum]
 
-    @field_validator('granularity')
+    @field_validator("granularity")
     def must_be_synthetic(cls, v):
         if v != GranularityEnum.FUSED_OPERATOR:
-            raise ValueError('source must be SYNTHETIC')
+            raise ValueError("source must be SYNTHETIC")
         return v
+
 
 # ---------------------------
 # Define Executor configuration as a nested model
@@ -54,6 +58,7 @@ class FusedOperatorConfig(BaseModel):
 class ExecutorConfig(BaseModel):
     framework: FrameworkEnum
     device: DeviceEnum
+
 
 # ---------------------------
 # Define Dataset configuration:
@@ -66,10 +71,10 @@ class SyntheticDatasetConfig(BaseModel):
     batch_size: int
     dtype: DtypeEnum
 
-    @field_validator('source')
+    @field_validator("source")
     def must_be_synthetic(cls, v):
         if v != DataSourceEnum.SYNTHETIC:
-            raise ValueError('source must be SYNTHETIC')
+            raise ValueError("source must be SYNTHETIC")
         return v
 
     @property
@@ -81,15 +86,16 @@ class SyntheticDatasetConfig(BaseModel):
     def input_shape(self, value):
         self._input_shape = value
 
+
 class ConcreteDatasetConfig(BaseModel):
     source: DataSourceEnum
     batch_size: int
     dtype: DtypeEnum
 
-    @field_validator('source')
+    @field_validator("source")
     def must_be_synthetic(cls, v):
         if v == DataSourceEnum.SYNTHETIC:
-            raise ValueError('source must not be SYNTHETIC')
+            raise ValueError("source must not be SYNTHETIC")
         return v
 
     @property
@@ -106,6 +112,7 @@ class ConcreteDatasetConfig(BaseModel):
 DatasetConfig = Union[SyntheticDatasetConfig, ConcreteDatasetConfig]
 WorkloadConfig = Union[OperatorConfig, ModelConfig, FusedOperatorConfig]
 
+
 # ---------------------------
 # Define Experiment configuration model
 # ---------------------------
@@ -115,6 +122,7 @@ class ExperimentConfig(BaseModel):
     executor: ExecutorConfig
     timer: TimerEnum
 
+
 # ---------------------------
 # Define top-level configuration model integrating workload and experiment configurations
 # ---------------------------
@@ -123,6 +131,7 @@ class BenchmarkConfig(BaseModel):
     workload: WorkloadConfig
     experiment: ExperimentConfig
     dataset: DatasetConfig
+
 
 @dataclass
 class Record:
@@ -141,17 +150,23 @@ class Record:
         :return: Formatted string representation of the summary.
         """
         if format == "json":
-            return json.dumps({"config": self.config.model_dump(),
-                               "summary": self.summary}, default=enum_serializer, indent=indent, ensure_ascii=False)
+            return json.dumps(
+                {"config": self.config.model_dump(), "summary": self.summary},
+                default=enum_serializer,
+                indent=indent,
+                ensure_ascii=False,
+            )
         elif format == "str":
-            return "\n".join([f"{key}: {value}" for key, value in self.to_dict().items()])
+            return "\n".join(
+                [f"{key}: {value}" for key, value in self.to_dict().items()]
+            )
         else:
             raise ValueError(f"Unsupported format: {format}")
 
-class ConfigBuilder:
 
+class ConfigBuilder:
     @classmethod
-    def load_config(cls, filepath: str) -> 'BenchmarkConfig':
+    def load_config(cls, filepath: str) -> "BenchmarkConfig":
         with open(filepath, "r") as file:
             config_dict = yaml.safe_load(file)
 
@@ -164,4 +179,3 @@ class ConfigBuilder:
 
         except Exception as e:
             print("Configuration error:", e)
-

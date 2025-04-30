@@ -15,7 +15,9 @@ class ExecutorBase(ABC):
     device_info: dict = field(default_factory=dict)
 
     def __post_init__(self):
-        TRACE("Create {} for task {}".format(self.__class__.__name__, self.config.label))
+        TRACE(
+            "Create {} for task {}".format(self.__class__.__name__, self.config.label)
+        )
         self.run_mode = self.config.experiment.run_mode
 
     def _validate(self) -> bool:
@@ -23,7 +25,7 @@ class ExecutorBase(ABC):
         for field_name, value in self.__dict__.items():
             if value is None or (isinstance(value, str) and not value.strip()):
                 print(f"Field '{field_name}' is empty or not set.")
-                assert(0)
+                assert 0
         return True
 
     # def set_workload(self, workload: WorkloadBase):
@@ -48,4 +50,3 @@ class ExecutorBase(ABC):
     def execute(self):
         """Execute the workload using data from the data provider."""
         pass
-

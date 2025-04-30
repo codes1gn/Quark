@@ -13,4 +13,3 @@ x = torch.rand(3, 3).cuda()
 y = torch.rand(3, 3).cuda()
 z = x + y
 print("Computation result on GPU:\n", z)
-

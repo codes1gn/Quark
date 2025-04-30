@@ -21,8 +21,7 @@ def draw_plot_1x1(chart_type, linelabel, data_list, title="Title", rotation=0):
 
     fig, (subfig) = plt.subplots(ncols=1, figsize=(4, 3))
     if chart_type == "line":
-        plot_data = pd.DataFrame(
-            dict(zip(linelabel, [res for res in data_list])))
+        plot_data = pd.DataFrame(dict(zip(linelabel, [res for res in data_list])))
         sns.lineplot(plot_data, ax=subfig)
     elif chart_type == "bar":
         plot_data = pd.DataFrame(
@@ -34,7 +33,9 @@ def draw_plot_1x1(chart_type, linelabel, data_list, title="Title", rotation=0):
     plt.suptitle(title)
 
 
-def draw_plots_nx1(chart_types, linelabels,  data_lists, x_lists=[], title="Title", rotation=0):
+def draw_plots_nx1(
+    chart_types, linelabels, data_lists, x_lists=[], title="Title", rotation=0
+):
     for chart_type in chart_types:
         assert chart_type == "line" or chart_type == "bar"
     subfig_cnt = len(chart_types)
@@ -50,8 +51,7 @@ def draw_plots_nx1(chart_types, linelabels,  data_lists, x_lists=[], title="Titl
         linelabel = linelabels[idx]
         subfig = subfigs[idx]
         if chart_type == "line":
-            plot_data = pd.DataFrame(
-                dict(zip(linelabel, [res for res in data_list])))
+            plot_data = pd.DataFrame(dict(zip(linelabel, [res for res in data_list])))
             sns.lineplot(plot_data, ax=subfig)
             subfig.set_xticklabels(x_list)
         elif chart_type == "bar":

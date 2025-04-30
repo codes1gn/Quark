@@ -1,4 +1,3 @@
-
 # common/enum.py
 
 from dataclasses import dataclass
@@ -24,10 +23,12 @@ class EnumWithFromStringMeta(EnumMeta):
         dct["from_string"] = classmethod(from_string)
         return super().__new__(cls, name, bases, dct)
 
+
 class RunModeEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
     INFERENCE = "inference"
     TRAINING = "training"
+
 
 class FrameworkEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
@@ -35,6 +36,7 @@ class FrameworkEnum(Enum, metaclass=EnumWithFromStringMeta):
     TENSORFLOW = "tensorflow"
     TVM = "tvm"
     IREE = "iree"
+
 
 class TimerEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
@@ -44,11 +46,13 @@ class TimerEnum(Enum, metaclass=EnumWithFromStringMeta):
     IREE = "iree"
     TVM = "tvm"
 
+
 class DataSourceEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
     SYNTHETIC = "synthetic"
     CIFAR10 = "cifar10"
     MNIST = "mnist"
+
 
 class DtypeEnum(Enum, metaclass=EnumWithFromStringMeta):
     FLOAT32 = "float32"
@@ -56,12 +60,14 @@ class DtypeEnum(Enum, metaclass=EnumWithFromStringMeta):
 
     def to_numpy(self):
         import numpy as np
+
         if self == DtypeEnum.FLOAT32:
-           return np.float32
+            return np.float32
         elif self == DtypeENum.FLOAT16:
             return np.float16
         else:
             raise ValueError(f"Unsupported enum value: {self}")
+
 
 class DeviceEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
@@ -69,12 +75,14 @@ class DeviceEnum(Enum, metaclass=EnumWithFromStringMeta):
     GPU = "gpu"
     TPU = "tpu"
 
+
 # Granularity level indicates the type of workload (operator, model, etc.)
 class GranularityEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
     OPERATOR = "operator"
     MODEL = "model"
     FUSED_OPERATOR = "fused_operator"
+
 
 # Operator workload options
 class OperatorEnum(Enum, metaclass=EnumWithFromStringMeta):
@@ -86,6 +94,7 @@ class OperatorEnum(Enum, metaclass=EnumWithFromStringMeta):
     MAX_POOL = "max_pool"
     AVG_POOL = "avg_pool"
     DROPOUT = "dropout"
+
 
 class ModelEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"

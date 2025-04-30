@@ -2,8 +2,8 @@ from .config import *
 from .enum import *
 from .error import *
 from .platform import *
-from .string import *
 from .sandbox import *
 from .serialise import *
+from .string import *
 from .trace import *
 from .validator import *

@@ -1,10 +1,11 @@
-
 import timeit
 from enum import Enum
-import numpy as np
 
+import numpy as np
 from quark_utility import *
+
 from .timer_base import TimerBase
+
 
 # default version of timer for benchmark, use it if not use specific ones
 class PyTimer(TimerBase):
@@ -12,6 +13,7 @@ class PyTimer(TimerBase):
 
     def observe(self) -> float:
         return timeit.default_timer()
+
 
 class TimerBuilder:
     """Builds a Timer instance based on a TimerEnum enum, with a default to PyTimer."""
@@ -33,6 +35,7 @@ class TimerBuilder:
             return PyTimer(repeat_samples, warmup_samples)
         elif timer_type == TimerEnum.TORCH:
             from .torch_timer import PyTorchTimer
+
             return PyTorchTimer(repeat_samples, warmup_samples)
         elif timer_type == TimerEnum.TENSORFLOW:
             return TensorFlowTimer(repeat_samples, warmup_samples)

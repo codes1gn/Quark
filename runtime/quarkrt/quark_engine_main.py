@@ -1,48 +1,52 @@
 import argparse
-import warnings
 import sys
+import warnings
 from pathlib import Path
 
-from quarkrt import Runner 
-from quarkrt import ExecutorBuilder
-from quarkrt import WorkloadBuilder
-from quarkrt import DataProviderBuilder
 from quark_utility import *
+from quarkrt import (DataProviderBuilder, ExecutorBuilder, Runner,
+                     WorkloadBuilder)
 
 warnings.filterwarnings("ignore")
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Ragdoll Benchmark CLI")
     parser.add_argument(
-        '--bench', 
-        action='store_true', 
-        help="Run all benchmarks from the benchmark directory"
+        "--bench",
+        action="store_true",
+        help="Run all benchmarks from the benchmark directory",
     )
     parser.add_argument(
-        '--task', 
-        type=str, 
-        default="experiments/inference/1.yml", 
-        help="Directory containing benchmark configuration files (default: 'benchmarks')"
+        "--task",
+        type=str,
+        default="experiments/inference/1.yml",
+        help="Directory containing benchmark configuration files (default: 'benchmarks')",
     )
     parser.add_argument(
-        '--label',
+        "--label",
         type=str,
         default=None,
-        help="Run the benchmark with the specified label"
+        help="Run the benchmark with the specified label",
     )
     # TODO: add tag mechanism
     parser.add_argument(
-        '--filter-by',
+        "--filter-by",
         type=str,
         default=None,
-        help="Run the benchmark with the specified filtering tag"
+        help="Run the benchmark with the specified filtering tag",
     )
     parser.add_argument("--trace", action="store_true", help="Enable trace logging")
-    parser.add_argument("--debug", action="store_true", help="Enable debug-level trace logging")
+    parser.add_argument(
+        "--debug", action="store_true", help="Enable debug-level trace logging"
+    )
     parser.add_argument("--torch", action="store_true", help="Enable torch support")
-    parser.add_argument("--tensorflow", action="store_true", help="Enable tensorflow support")
+    parser.add_argument(
+        "--tensorflow", action="store_true", help="Enable tensorflow support"
+    )
     return parser.parse_args()
     return parser.parse_args()
+
 
 def main():
     args = parse_args()
@@ -88,8 +92,7 @@ def main():
 
     # progress = (idx) / total_tasks * 100
     # print(f"Progress: {progress:.2f}%")
-        
+
 
 if __name__ == "__main__":
     main()
-

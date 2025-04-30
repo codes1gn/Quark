@@ -14,7 +14,7 @@ class DataProviderBase(ABC):
     data_type: type = DtypeEnum.FLOAT32
     data_source: DataSourceEnum = DataSourceEnum.SYNTHETIC
     dataset: any = field(init=None)
-    
+
     def __init__(self, config: BenchmarkConfig):
         TRACE("Create {} for task {}".format(self.__class__.__name__, config.label))
         self.batch_size = config.dataset.batch_size
@@ -22,7 +22,7 @@ class DataProviderBase(ABC):
         self.data_type = config.dataset.dtype
         self.data_source = config.dataset.source
         self.load_dataset(config)
-        assert(self._validate())
+        assert self._validate()
 
     def _validate(self) -> bool:
         # Check if any field is None or empty
@@ -51,7 +51,9 @@ class DataProviderBase(ABC):
         """Returns an iterator that yields batches of data."""
         if self.data_source == DataSourceEnum.SYNTHETIC:
             # Infinite loop using itertools.cycle for synthetic data
-            self._iterator = self._generate_synthetic_data_batches()  # Infinite synthetic data
+            self._iterator = (
+                self._generate_synthetic_data_batches()
+            )  # Infinite synthetic data
         else:
             self._iterator = iter(self.dataset)
         return self

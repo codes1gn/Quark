@@ -2,10 +2,10 @@ import io
 import sys
 from dataclasses import dataclass, field
 from typing import Any, Optional
+
 import torch
 import torch.nn as nn
 import torchvision.models as models
-
 from quark_utility import *
 from quarkrt.workload.workload_base import *
 
@@ -27,7 +27,7 @@ class TorchWorkload(WorkloadBase):
                 self.workload = models.resnet18(pretrained=False)
             finally:
                 sys.stdout = sys.__stdout__
-            assert(self.workload is not None)
+            assert self.workload is not None
 
             captured_output.seek(0)  # Go to the beginning of the captured output
             output = captured_output.read()
@@ -47,7 +47,7 @@ class TorchWorkload(WorkloadBase):
                 # self.workload.load_state_dict({k: torch.ones_like(v) * MAGIC_NUM for k, v in self.workload.state_dict().items()})
             finally:
                 sys.stdout = sys.__stdout__
-            assert(self.workload is not None)
+            assert self.workload is not None
 
             captured_output.seek(0)  # Go to the beginning of the captured output
             output = captured_output.read()
@@ -76,5 +76,3 @@ class TorchWorkload(WorkloadBase):
             self.workload = nn.MaxPool2d(kernel_size=2, stride=2)
         else:
             raise ValueError(f"Unsupported operator: {operator_type}")
-
-

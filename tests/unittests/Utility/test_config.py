@@ -1,4 +1,3 @@
-
 # RUN: python -m pytest -q -v --tb=short %s
 
 from enum import Enum
@@ -31,6 +30,7 @@ def sample_config_yaml():
       dtype: float32
     """
 
+
 @pytest.fixture
 def sample_config_file(tmpdir, sample_config_yaml):
     """Fixture to create a temporary config YAML file."""
@@ -38,9 +38,10 @@ def sample_config_file(tmpdir, sample_config_yaml):
     config_file.write(sample_config_yaml)
     return str(config_file)
 
+
 def test_config_load_task_from_yaml(sample_config_file):
     """Test if the Config class correctly loads the YAML configuration."""
-    
+
     # Load the config from the YAML file
     # config = Config.load_task_from_yaml(sample_config_file)
 
@@ -62,8 +63,8 @@ def test_config_load_task_from_yaml(sample_config_file):
     assert config.experiment.executor.device == DeviceEnum.GPU
 
     assert config.dataset.source == DataSourceEnum.SYNTHETIC
-    assert config.dataset.batch_size == 32 
-    assert config.dataset.input_shape == [1, 3, 224, 224] 
+    assert config.dataset.batch_size == 32
+    assert config.dataset.input_shape == [1, 3, 224, 224]
 
     assert config.workload.framework == FrameworkEnum.TORCH
     assert config.workload.granularity == GranularityEnum.OPERATOR

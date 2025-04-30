@@ -1,15 +1,18 @@
 #ifndef QUARK_PLUGINS_ARGUMENTS_H_
 #define QUARK_PLUGINS_ARGUMENTS_H_
 
-#include <vector>
+#include <stdexcept>
 #include <string>
 #include <variant>
-#include <stdexcept>
+#include <vector>
 
-using OperatorArg = std::variant<int, float, double, float*, double*>;
+using OperatorArg = std::variant<int, float, double, float *, double *>;
 
-OperatorArg parseArgument(const std::string& arg, const std::string& expected_type);
+OperatorArg parseArgument(const std::string &arg,
+                          const std::string &expected_type);
 
-std::vector<OperatorArg> parseArguments(const std::vector<std::string>& arguments, const std::vector<std::string>& expected_types);
+std::vector<OperatorArg>
+parseArguments(const std::vector<std::string> &arguments,
+               const std::vector<std::string> &expected_types);
 
 #endif // QUARK_PLUGINS_ARGUMENTS_H_
