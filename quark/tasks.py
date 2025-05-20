@@ -11,7 +11,6 @@ from platform import python_version
 import numpy as np
 from invoke import Collection, Context, task
 from quark_utility import *
-from quark_plugins import *
 
 from quark import BenchCoordinator
 

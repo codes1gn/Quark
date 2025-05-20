@@ -51,8 +51,6 @@ class RunModeEnum(Enum, metaclass=EnumWithFromStringMeta):
 #     return Enum(cls.__name__, combined)
 #
 # @auto_extend_enum
-# plugins_list = [('CATZILLA', 'catzilla')]
-from quark_plugins import plugins_list
 class FrameworkEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
     TORCH = "torch"
@@ -62,6 +60,7 @@ class FrameworkEnum(Enum, metaclass=EnumWithFromStringMeta):
 
     @classmethod
     def register_plugins(cls):
+        from .plugins import plugins_list
         for plugin in plugins_list:
             register_plugins(FrameworkEnum, framework_plugins, *plugin)
         # register_plugins(FrameworkEnum, framework_plugins, 'CATZILLA', 'catzilla')
@@ -102,6 +101,15 @@ class DtypeEnum(Enum, metaclass=EnumWithFromStringMeta):
             raise ValueError(f"Unsupported enum value: {self}")
 
 
+class RNGEnum(Enum, metaclass=EnumWithFromStringMeta):
+    UNKNOWN = "unknown"
+    UNIFORM = "uniform"
+    ZEROS = "zeros"
+    ONES = "ones"
+    RANGES = "ranges"
+    NORMAL = "normal"
+
+
 class DeviceEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
     CPU = "cpu"
@@ -120,6 +128,8 @@ class GranularityEnum(Enum, metaclass=EnumWithFromStringMeta):
 # Operator workload options
 class OperatorEnum(Enum, metaclass=EnumWithFromStringMeta):
     UNKNOWN = "unknown"
+    GEMM = "gemm"
+    MATMUL = "matmul"
     CONV2D = "conv2d"
     FULLY_CONNECTED = "fully_connected"
     RELU = "relu"

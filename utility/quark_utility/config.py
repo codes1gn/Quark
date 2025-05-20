@@ -22,7 +22,7 @@ class OperatorConfig(BaseModel):
     operator: OperatorEnum
 
     @field_validator("granularity")
-    def must_be_synthetic(cls, v):
+    def check_granularity(cls, v):
         if v != GranularityEnum.OPERATOR:
             raise ValueError("source must be SYNTHETIC")
         return v
@@ -34,7 +34,7 @@ class ModelConfig(BaseModel):
     model: ModelEnum
 
     @field_validator("granularity")
-    def must_be_synthetic(cls, v):
+    def check_granularity(cls, v):
         if v != GranularityEnum.MODEL:
             raise ValueError("source must be SYNTHETIC")
         return v
@@ -46,7 +46,7 @@ class FusedOperatorConfig(BaseModel):
     operators: List[OperatorEnum]
 
     @field_validator("granularity")
-    def must_be_synthetic(cls, v):
+    def check_granularity(cls, v):
         if v != GranularityEnum.FUSED_OPERATOR:
             raise ValueError("source must be SYNTHETIC")
         return v
@@ -67,12 +67,13 @@ class ExecutorConfig(BaseModel):
 # ---------------------------
 class SyntheticDatasetConfig(BaseModel):
     source: DataSourceEnum
-    input_shape: List[int]
-    batch_size: int
+    input_shape: Union[List[int], Tuple[List[int], ...]]
+    batch_size: Optional[int] = None
     dtype: DtypeEnum
+    rng: Optional[RNGEnum] = RNGEnum.ZEROS
 
     @field_validator("source")
-    def must_be_synthetic(cls, v):
+    def check_source(cls, v):
         if v != DataSourceEnum.SYNTHETIC:
             raise ValueError("source must be SYNTHETIC")
         return v
@@ -93,7 +94,7 @@ class ConcreteDatasetConfig(BaseModel):
     dtype: DtypeEnum
 
     @field_validator("source")
-    def must_be_synthetic(cls, v):
+    def check_source(cls, v):
         if v == DataSourceEnum.SYNTHETIC:
             raise ValueError("source must not be SYNTHETIC")
         return v

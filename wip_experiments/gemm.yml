@@ -3,20 +3,20 @@ label: matmul-catzilla
 
 workload:
   framework: catzilla
-  granularity: model 
-  model: resnet152 
+  granularity: operator 
+  operator: gemm 
 
 experiment:
   run_mode: inference
   executor:
-    framework: torch
+    framework: catzilla 
     device: gpu
   timer: python
 
 dataset:
   source: synthetic
-  input_shape: [3, 224, 224]
-  batch_size: 1
+  input_shape: [[1024, 1024], [1024, 1024]]
   dtype: float32
+  rng: uniform
 
 
