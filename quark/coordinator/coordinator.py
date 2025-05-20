@@ -47,6 +47,7 @@ class BenchCoordinator:
 
     def run_benchmark(self, task_file, idx, total_tasks):
         config = self.decode(task_file)
+        assert(0)
         label = config.label
         print(f"\nProcessing task {idx}/{total_tasks}: {label}")
         run(self.arguments.ctx, task_file)

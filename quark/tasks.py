@@ -11,6 +11,7 @@ from platform import python_version
 import numpy as np
 from invoke import Collection, Context, task
 from quark_utility import *
+from quark_plugins import *
 
 from quark import BenchCoordinator
 
@@ -190,12 +191,15 @@ class Argument:
 
 
 @task
-def bench(ctx, task=""):
+def bench(ctx, task="", task_dir=""):
     enable_trace()
     print("Starting benchmark collection and execution...")
     arg = Argument()
     arg.label = task
     arg.ctx = ctx
+    print(task_dir)
+    if task_dir is not "":
+        arg.config_dir = task_dir
     TRACE(f"arguments = {arg}")
     coordinator = BenchCoordinator(arguments=arg, config_dir=arg.config_dir)
     coordinator.bench()

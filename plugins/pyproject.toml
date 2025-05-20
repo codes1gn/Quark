@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "quark"
+name = "quark_plugins"
 version = "0.1.0"
 description = "Query-based All-in-one Research Kit (PyTorch)"
 authors = ["Albert Shi <heng.shi@sjtu.edu.cn>"]
@@ -15,17 +15,8 @@ mkdocs-markdownextradata-plugin = "^0.2.6"
 numpy = "1.23.4"
 pytest = "^8.3.5"
 pydantic = "^2.11.3"
-quark_utility = { path = "utility", develop = true, extras = ["plugins"] }
 invoke = "^2.2.0"
-msgpack = "^1.1.0"
 
 [[tool.poetry.packages]]
-include = "quark"
-
-[tool.poetry.scripts]
-quark = "quark.quark_main:program.run"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+include = "quark_plugins"
 
