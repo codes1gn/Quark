@@ -4,6 +4,7 @@ import numpy as np
 from quark_utility import *
 
 from .data_provider_base import *
+from .catzilla_data_provider import CATZILLADataProvider
 
 
 class DataProviderBuilder:
@@ -28,13 +29,15 @@ class DataProviderBuilder:
 
             return TensorFlowDataProvider(config)
 
-        elif framework_type == ExecutorType.IREE:
+        elif config.experiment.executor.framework == FrameworkEnum.IREE:
             from .iree_data_provider import IREEDataProvider
 
-            dataprod = IREEDataProvider(batch_size, input_shape, data_type)
-            dataprod.dataset_type = dataset_type
-            return dataprod
+            return IREEDataProvider(config)
+
+        elif config.experiment.executor.framework == FrameworkEnum.CATZILLA:
+            return CATZILLADataProvider(config)
+
         else:
             raise ValueError(
-                f"Unsupported framework type: {config.executor}, and dataset: {config.dataset}"
+                f"Unsupported framework type: {config.experiment.executor.framework}, and dataset: {config.dataset}"
             )

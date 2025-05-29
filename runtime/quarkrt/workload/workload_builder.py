@@ -22,5 +22,9 @@ class WorkloadBuilder:
             from quarkrt.workload.iree_workload import IREEWorkload
 
             return IREEWorkload(config)
+        elif config.workload.framework == FrameworkEnum.CATZILLA:
+            from quarkrt.workload.catzilla_workload import CATZILLAWorkload
+
+            return CATZILLAWorkload(config)
         else:
             raise ValueError(f"Unsupported workload type: {config.workload}")

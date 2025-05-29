@@ -1,4 +1,5 @@
 from quark_utility import *
+from .catzilla_executor import CATZILLAExecutor
 
 
 class ExecutorBuilder:
@@ -13,7 +14,7 @@ class ExecutorBuilder:
             from .tf_executor import TFExecutor
 
             return TFExecutor(config=config)
-        # elif executor_type == ExecutorType.IREE:
-        #     return IREEExecutor()
+        elif config.experiment.executor.framework == FrameworkEnum.CATZILLA:
+            return CATZILLAExecutor(config=config)
         else:
-            raise ValueError(f"Unsupported executor type: {executor_type}")
+            raise ValueError(f"Unsupported executor type: {config.experiment.executor.framework}")
