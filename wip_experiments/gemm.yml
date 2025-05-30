@@ -15,7 +15,7 @@ experiment:
 
 dataset:
   source: synthetic
-  input_shape: [[1024, 1024], [1024, 1024]]
+  input_shape: [[1024, 1024], [1024, 1024], [1024, 1024]]
   dtype: float32
   rng: uniform
 

@@ -27,17 +27,18 @@ class CATZILLADataProvider(DataProviderBase):
     def _generate_synthetic_data(self):
         """Generate synthetic data based on configuration."""
         TRACE("Generating synthetic data for CATZILLADataProvider")
+        numpy_dtype = self.dtype.to_numpy()
         if self.rng == RNGEnum.UNIFORM:
-            self.data = [np.random.uniform(size=shape).astype(self.dtype) 
+            self.data = [np.random.uniform(size=shape).astype(numpy_dtype) 
                         for shape in self.input_shape]
         elif self.rng == RNGEnum.ZEROS:
-            self.data = [np.zeros(shape).astype(self.dtype) 
+            self.data = [np.zeros(shape).astype(numpy_dtype) 
                         for shape in self.input_shape]
         elif self.rng == RNGEnum.ONES:
-            self.data = [np.ones(shape).astype(self.dtype) 
+            self.data = [np.ones(shape).astype(numpy_dtype) 
                         for shape in self.input_shape]
         elif self.rng == RNGEnum.NORMAL:
-            self.data = [np.random.normal(size=shape).astype(self.dtype) 
+            self.data = [np.random.normal(size=shape).astype(numpy_dtype) 
                         for shape in self.input_shape]
         else:
             raise ValueError(f"Unsupported RNG type: {self.rng}")
